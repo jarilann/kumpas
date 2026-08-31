@@ -60,15 +60,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (error == null) {
       // Save the full name to the Firebase user profile.
       await _authService.updateDisplayName(_nameController.text.trim());
+
+      if (!mounted) return;
+
+      // AuthWrapper's StreamBuilder in main.dart does swap its child to
+      // HomeScreen the moment sign-up succeeds — but that swap happens on
+      // the ROOT route. Since SignUpScreen was reached via Navigator.push
+      // (not the root route itself), it sits on top of that swap and
+      // hides it until popped. So we explicitly clear back to root here
+      // instead of waiting on the stream.
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      return;
     }
 
     setState(() {
       _isLoading = false;
       _errorMessage = error;
     });
-
-    // On success, AuthWrapper's StreamBuilder in main.dart detects the
-    // newly signed-in user and navigates to HomeScreen automatically.
   }
 
   @override

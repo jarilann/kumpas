@@ -48,10 +48,13 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (error == null) {
-      // No manual navigation needed here. AuthWrapper's StreamBuilder
-      // in main.dart listens to authStateChanges() and automatically
-      // swaps the entire screen (out from under Onboarding/Welcome/
-      // Login/SignUp) to HomeScreen the moment sign-in succeeds.
+      // AuthWrapper's StreamBuilder in main.dart does swap its child to
+      // HomeScreen the moment sign-in succeeds — but that swap happens on
+      // the ROOT route. Since LoginScreen was reached via Navigator.push
+      // (not the root route itself), it sits on top of that swap and
+      // hides it until popped. So we explicitly clear back to root here
+      // instead of waiting on the stream.
+      Navigator.of(context).popUntil((route) => route.isFirst);
     } else {
       setState(() {
         _isLoading = false;

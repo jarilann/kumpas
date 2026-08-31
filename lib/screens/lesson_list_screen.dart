@@ -5,16 +5,20 @@ import '../models/module_model.dart';
 import '../models/user_progress_model.dart';
 import '../services/progress_service.dart';
 import '../widgets/module_widgets.dart';
-import 'lesson_list_screen.dart';
 
-class ModuleListScreen extends StatefulWidget {
-  const ModuleListScreen({super.key});
+/// Shows the lessons within a single [module] (e.g. Modyul 1's
+/// "Alpabeto" and "Numero"), each downloadable/lockable on its own —
+/// see mockup screen 6.
+class LessonListScreen extends StatefulWidget {
+  final ModuleModel module;
+
+  const LessonListScreen({super.key, required this.module});
 
   @override
-  State<ModuleListScreen> createState() => _ModuleListScreenState();
+  State<LessonListScreen> createState() => _LessonListScreenState();
 }
 
-class _ModuleListScreenState extends State<ModuleListScreen> {
+class _LessonListScreenState extends State<LessonListScreen> {
   late Future<Map<String, LessonProgress>> _statesFuture;
 
   @override
@@ -23,30 +27,24 @@ class _ModuleListScreenState extends State<ModuleListScreen> {
     _statesFuture = ProgressService.instance.getLessonStates(kModules);
   }
 
-  Future<void> _refresh() async {
-    setState(() {
-      _statesFuture = ProgressService.instance.getLessonStates(kModules);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return ModuleScaffold(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Matuto',
-            style: TextStyle(
+          Text(
+            widget.module.number,
+            style: const TextStyle(
               color: AppColors.textWhite,
               fontSize: 24,
               fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Mga Modyul',
-            style: TextStyle(color: AppColors.textWhiteMuted, fontSize: 14),
+          Text(
+            widget.module.title,
+            style: const TextStyle(color: AppColors.textWhiteMuted, fontSize: 14),
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -61,31 +59,31 @@ class _ModuleListScreenState extends State<ModuleListScreen> {
                   );
                 }
                 final states = snapshot.data!;
-                final service = ProgressService.instance;
 
                 return ListView.separated(
-                  itemCount: kModules.length,
+                  itemCount: widget.module.lessons.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 14),
                   itemBuilder: (context, index) {
-                    final module = kModules[index];
-                    final unlocked = service.isModuleUnlocked(module, states);
-                    final completed = service.isModuleCompleted(module, states);
-                    final progress =
-                        service.moduleProgressFraction(module, states);
+                    final lesson = widget.module.lessons[index];
+                    final state = states[lesson.id] ??
+                        LessonProgress.initial(unlocked: false);
 
-                    return _ModuleTile(
-                      module: module,
-                      unlocked: unlocked,
-                      completed: completed,
-                      progress: progress,
-                      onTap: () async {
-                        if (!unlocked) return;
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => LessonListScreen(module: module),
+                    return _LessonTile(
+                      title: lesson.title,
+                      state: state,
+                      onTap: () {
+                        if (!state.unlocked) return;
+                        // Lesson content player (mockup screens 8/9)
+                        // is built in a later step — for now just
+                        // confirm the tap landed on an unlocked
+                        // lesson.
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '${lesson.title} — lesson content malapit na!',
+                            ),
                           ),
                         );
-                        _refresh();
                       },
                     );
                   },
@@ -99,24 +97,22 @@ class _ModuleListScreenState extends State<ModuleListScreen> {
   }
 }
 
-class _ModuleTile extends StatelessWidget {
-  final ModuleModel module;
-  final bool unlocked;
-  final bool completed;
-  final double progress;
+class _LessonTile extends StatelessWidget {
+  final String title;
+  final LessonProgress state;
   final VoidCallback onTap;
 
-  const _ModuleTile({
-    required this.module,
-    required this.unlocked,
-    required this.completed,
-    required this.progress,
+  const _LessonTile({
+    required this.title,
+    required this.state,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final showProgressBar = unlocked && !completed && progress > 0;
+    final showProgressBar =
+        state.unlocked && !state.completed && state.total > 0 && state.score > 0;
+    final progress = state.total > 0 ? state.score / state.total : 0.0;
 
     return Material(
       color: AppColors.accentYellow,
@@ -128,33 +124,31 @@ class _ModuleTile extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: Colors.white24,
-                child: Icon(module.icon, color: AppColors.textWhite),
-              ),
-              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      module.number,
-                      style: const TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    Text(
-                      module.title,
-                      style: const TextStyle(
-                        color: AppColors.textWhiteMuted,
-                        fontSize: 12,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            color: AppColors.textWhite,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        if (state.unlocked)
+                          const Icon(
+                            Icons.download_rounded,
+                            color: AppColors.textWhite,
+                            size: 16,
+                          ),
+                      ],
                     ),
                     if (showProgressBar) ...[
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
                           Expanded(
@@ -186,7 +180,7 @@ class _ModuleTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              _StatusIcon(unlocked: unlocked, completed: completed),
+              _StatusIcon(state: state),
             ],
           ),
         ),
@@ -196,16 +190,15 @@ class _ModuleTile extends StatelessWidget {
 }
 
 class _StatusIcon extends StatelessWidget {
-  final bool unlocked;
-  final bool completed;
-  const _StatusIcon({required this.unlocked, required this.completed});
+  final LessonProgress state;
+  const _StatusIcon({required this.state});
 
   @override
   Widget build(BuildContext context) {
-    if (!unlocked) {
+    if (!state.unlocked) {
       return const Icon(Icons.lock_outline_rounded, color: AppColors.textWhite);
     }
-    if (completed) {
+    if (state.completed) {
       return const Icon(Icons.check_circle_rounded, color: AppColors.textWhite);
     }
     return const Icon(Icons.diamond_outlined, color: AppColors.textWhite);
