@@ -52,3 +52,5 @@ class LessonModel {
     required this.quiz,
   });
 }
+/// A module is a collection of lessons
+//
