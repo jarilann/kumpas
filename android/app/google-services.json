@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "247784966868",
+    "project_id": "kumpaskonek",
+    "storage_bucket": "kumpaskonek.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:247784966868:android:1667b4352f139933084941",
+        "android_client_info": {
+          "package_name": "com.example.kumpaskonek_12"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCd5NEvkWYJAFp5IJ-ePZrMTseZiy8ZhCI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
