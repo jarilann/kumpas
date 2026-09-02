@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../constants/app_colors.dart';
 import '../models/module_model.dart';
 import '../models/lesson_model.dart';
@@ -55,7 +56,9 @@ class _QuizHomeScreenState extends State<QuizHomeScreen> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(
-                    child: CircularProgressIndicator(color: AppColors.textWhite),
+                    child: CircularProgressIndicator(
+                      color: AppColors.textWhite,
+                    ),
                   );
                 }
                 final states = snapshot.data!;
@@ -70,8 +73,9 @@ class _QuizHomeScreenState extends State<QuizHomeScreen> {
                     final firstLesson = module.lessons.first;
                     final state = states[firstLesson.id];
                     final unlocked = state?.unlocked ?? false;
-                    final completed = module.lessons
-                        .every((l) => states[l.id]?.completed == true);
+                    final completed = module.lessons.every(
+                      (l) => states[l.id]?.completed == true,
+                    );
 
                     // Combined score across all lessons in the module.
                     int totalScore = 0;
@@ -181,8 +185,8 @@ class _QuizModuleTile extends StatelessWidget {
                 !unlocked
                     ? Icons.lock_outline_rounded
                     : completed
-                        ? Icons.check_circle_rounded
-                        : Icons.arrow_forward_ios_rounded,
+                    ? Icons.check_circle_rounded
+                    : Icons.arrow_forward_ios_rounded,
                 color: AppColors.textWhite,
                 size: 20,
               ),

@@ -215,7 +215,7 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: SingleChildScrollView(
@@ -306,7 +306,7 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
         Text(
           'Video available',
           style: TextStyle(
-            color: AppColors.textWhite.withOpacity(0.7),
+            color: AppColors.textWhite.withValues(alpha: 0.7),
             fontSize: 14,
           ),
         ),
