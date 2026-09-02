@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../constants/app_colors.dart';
 import '../services/auth_service.dart';
 import 'login_screen.dart';
@@ -42,12 +41,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
 
               const Text(
                 'MALIGAYANG\nPAGDATING!',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Chewy',
                   fontSize: 32,
@@ -60,6 +60,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
               const Text(
                 'Matuto. Kumonekta.\nMakipagkomunikasyon',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
                   color: AppColors.textWhiteMuted,
