@@ -67,6 +67,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/
+    - assets/videos/
   fonts:
     - family: Chewy
       fonts:
