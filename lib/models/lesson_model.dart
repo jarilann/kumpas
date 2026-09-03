@@ -24,7 +24,14 @@ class SignModel {
   /// 'assets/videos/modyul_1/alpabeto/a.mp4' -> '..._var2.mp4'.
   final String? videoAssetPathVar2;
 
+  /// Storage/asset path to a third accepted version, for the rare
+  /// signs that have three (e.g. "Brown"). Only meaningful when
+  /// [videoAssetPathVar2] is also set. Same "_var3" naming convention.
+
+  final String? videoAssetPathVar3;
+
   bool get hasVariant => videoAssetPathVar2 != null;
+  bool get hasThirdVariant => videoAssetPathVar3 != null;
 
   const SignModel({
     required this.id,
@@ -33,6 +40,7 @@ class SignModel {
     required this.description,
     this.videoAssetPath,
     this.videoAssetPathVar2,
+    this.videoAssetPathVar3,
   });
 }
 

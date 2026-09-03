@@ -614,6 +614,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Isang Daan',
             description: 'Dummy na paglalarawan ng senyas para sa \'100\' (Isang Daan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_1/numero/100.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_1/numero/100_var2.mp4',
           ),
           SignModel(
             id: '200',
@@ -621,6 +622,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Dalawang Daan',
             description: 'Dummy na paglalarawan ng senyas para sa \'200\' (Dalawang Daan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_1/numero/200.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_1/numero/200_var2.mp4',
           ),
           SignModel(
             id: '300',
@@ -628,6 +630,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Tatlong Daan',
             description: 'Dummy na paglalarawan ng senyas para sa \'300\' (Tatlong Daan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_1/numero/300.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_1/numero/300_var2.mp4',
           ),
           SignModel(
             id: '400',
@@ -635,6 +638,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Apat na Raan',
             description: 'Dummy na paglalarawan ng senyas para sa \'400\' (Apat na Raan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_1/numero/400.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_1/numero/400_var2.mp4',
           ),
           SignModel(
             id: '500',
@@ -642,6 +646,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Limang Daan',
             description: 'Dummy na paglalarawan ng senyas para sa \'500\' (Limang Daan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_1/numero/500.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_1/numero/500_var2.mp4',
           ),
           SignModel(
             id: '600',
@@ -649,6 +654,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Anim na Raan',
             description: 'Dummy na paglalarawan ng senyas para sa \'600\' (Anim na Raan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_1/numero/600.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_1/numero/600_var2.mp4',
           ),
           SignModel(
             id: '700',
@@ -656,6 +662,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Pitong Daan',
             description: 'Dummy na paglalarawan ng senyas para sa \'700\' (Pitong Daan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_1/numero/700.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_1/numero/700_var2.mp4',
           ),
           SignModel(
             id: '800',
@@ -663,6 +670,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Walong Daan',
             description: 'Dummy na paglalarawan ng senyas para sa \'800\' (Walong Daan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_1/numero/800.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_1/numero/800_var2.mp4',
           ),
           SignModel(
             id: '900',
@@ -670,6 +678,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Siyam na Raan',
             description: 'Dummy na paglalarawan ng senyas para sa \'900\' (Siyam na Raan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_1/numero/900.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_1/numero/900_var2.mp4',
           ),
           SignModel(
             id: '1000',
@@ -677,6 +686,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Isang Libo',
             description: 'Dummy na paglalarawan ng senyas para sa \'1000\' (Isang Libo). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_1/numero/1000.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_1/numero/1000_var2.mp4',
           ),
         ],
         quiz: [
@@ -1219,6 +1229,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Pula',
             description: 'Dummy na paglalarawan ng senyas para sa \'Red\' (Pula). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/red.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/red_var2.mp4',
           ),
           SignModel(
             id: 'orange',
@@ -1226,6 +1237,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Dalandan / Kahel',
             description: 'Dummy na paglalarawan ng senyas para sa \'Orange\' (Dalandan / Kahel). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/orange.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/orange_var2.mp4',
           ),
           SignModel(
             id: 'yellow',
@@ -1233,6 +1245,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Dilaw',
             description: 'Dummy na paglalarawan ng senyas para sa \'Yellow\' (Dilaw). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/yellow.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/yellow_var2.mp4',
           ),
           SignModel(
             id: 'green',
@@ -1240,6 +1253,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Luntian / Berde',
             description: 'Dummy na paglalarawan ng senyas para sa \'Green\' (Luntian / Berde). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/green.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/green_var2.mp4',
           ),
           SignModel(
             id: 'blue',
@@ -1247,6 +1261,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Bughaw / Asul',
             description: 'Dummy na paglalarawan ng senyas para sa \'Blue\' (Bughaw / Asul). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/blue.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/blue_var2.mp4',
           ),
           SignModel(
             id: 'violet',
@@ -1254,6 +1269,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Lila / Biyoleta',
             description: 'Dummy na paglalarawan ng senyas para sa \'Violet\' (Lila / Biyoleta). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/violet.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/violet_var2.mp4',
           ),
           SignModel(
             id: 'pink',
@@ -1261,6 +1277,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Rosas',
             description: 'Dummy na paglalarawan ng senyas para sa \'Pink\' (Rosas). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/pink.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/pink_var2.mp4',
           ),
           SignModel(
             id: 'black',
@@ -1268,6 +1285,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Itim',
             description: 'Dummy na paglalarawan ng senyas para sa \'Black\' (Itim). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/black.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/black_var2.mp4',
           ),
           SignModel(
             id: 'brown',
@@ -1275,6 +1293,8 @@ final List<ModuleModel> kModules = [
             meaning: 'Kayumanggi / Tsokolate',
             description: 'Dummy na paglalarawan ng senyas para sa \'Brown\' (Kayumanggi / Tsokolate). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/brown.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/brown_var2.mp4',
+            videoAssetPathVar3: 'assets/videos/modyul_3/mga_kulay/brown_var3.mp4',
           ),
           SignModel(
             id: 'white',
@@ -1282,6 +1302,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Puti',
             description: 'Dummy na paglalarawan ng senyas para sa \'White\' (Puti). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/white.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/white_var2.mp4',
           ),
           SignModel(
             id: 'grey',
@@ -1289,6 +1310,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Abuhin / Kulay-abo',
             description: 'Dummy na paglalarawan ng senyas para sa \'Grey\' (Abuhin / Kulay-abo). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/mga_kulay/grey.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/mga_kulay/grey_var2.mp4',
           ),
         ],
         quiz: [
@@ -1391,6 +1413,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Nasaktan',
             description: 'Dummy na paglalarawan ng senyas para sa \'Hurt\' (Nasaktan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_3/damdamin_at_emosyon/hurt.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_3/damdamin_at_emosyon/hurt_var2.mp4',
           ),
           SignModel(
             id: 'confused',
@@ -2444,6 +2467,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Hindi ko naiintindihan.',
             description: 'Dummy na paglalarawan ng senyas para sa \'I don\'t understand.\' (Hindi ko naiintindihan.). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_5/paghingi_ng_tulong/i_don_t_understand.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_5/paghingi_ng_tulong/i_don_t_understand_var2.mp4',
           ),
           SignModel(
             id: 'can_you_explain',
@@ -2766,6 +2790,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Tanggapan ng koreo',
             description: 'Dummy na paglalarawan ng senyas para sa \'Post office\' (Tanggapan ng koreo). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_5/mga_lugar_araw_araw/post_office.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_5/mga_lugar_araw_araw/post_office_var2.mp4',
           ),
           SignModel(
             id: 'park',
@@ -3873,6 +3898,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Hotdog',
             description: 'Dummy na paglalarawan ng senyas para sa \'Hotdog\' (Hotdog). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/modyul_7/pagkain/hotdog.mp4',
+            videoAssetPathVar2: 'assets/videos/modyul_7/pagkain/hotdog_var2.mp4',
           ),
           SignModel(
             id: 'rice',
