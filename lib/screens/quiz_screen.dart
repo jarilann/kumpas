@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../models/module_model.dart';
@@ -17,15 +18,42 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
+  late final List<QuizQuestionModel> _questions;
   int _currentQuestion = 0;
   int _score = 0;
   int? _selectedOption;
   bool _answered = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _questions = _shuffledQuiz(widget.lesson.quiz);
+  }
+
+  /// Returns a fresh copy of [source] with the question order shuffled
+  /// and, independently, each question's own answer options shuffled —
+  /// so neither the question sequence nor "always option 2" can be
+  /// memorized across attempts.
+  List<QuizQuestionModel> _shuffledQuiz(List<QuizQuestionModel> source) {
+    final rng = Random();
+    final questions = List<QuizQuestionModel>.from(source)..shuffle(rng);
+    return questions.map((q) {
+      final order = List<int>.generate(q.options.length, (i) => i)..shuffle(rng);
+      final shuffledOptions = [for (final i in order) q.options[i]];
+      final newCorrectIndex = order.indexOf(q.correctIndex);
+      return QuizQuestionModel(
+        question: q.question,
+        signLabel: q.signLabel,
+        options: shuffledOptions,
+        correctIndex: newCorrectIndex,
+      );
+    }).toList();
+  }
+
   void _selectOption(int optionIndex) {
     if (_answered) return;
 
-    final question = widget.lesson.quiz[_currentQuestion];
+    final question = _questions[_currentQuestion];
     final isCorrect = optionIndex == question.correctIndex;
 
     setState(() {
@@ -36,7 +64,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   Future<void> _nextQuestion() async {
-    final isLast = _currentQuestion == widget.lesson.quiz.length - 1;
+    final isLast = _currentQuestion == _questions.length - 1;
 
     if (!isLast) {
       setState(() {
@@ -51,7 +79,7 @@ class _QuizScreenState extends State<QuizScreen> {
     final unlockedNext = await ProgressService.instance.submitQuizResult(
       lessonId: widget.lesson.id,
       score: _score,
-      total: widget.lesson.quiz.length,
+      total: _questions.length,
       modules: kModules,
     );
 
@@ -61,7 +89,7 @@ class _QuizScreenState extends State<QuizScreen> {
       MaterialPageRoute(
         builder: (_) => QuizResultScreen(
           score: _score,
-          total: widget.lesson.quiz.length,
+          total: _questions.length,
           unlockedNext: unlockedNext,
         ),
       ),
@@ -70,7 +98,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final question = widget.lesson.quiz[_currentQuestion];
+    final question = _questions[_currentQuestion];
 
     return ModuleScaffold(
       child: Column(
@@ -90,7 +118,7 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Tanong ${_currentQuestion + 1} / ${widget.lesson.quiz.length}',
+            'Tanong ${_currentQuestion + 1} / ${_questions.length}',
             style: const TextStyle(color: AppColors.textWhiteMuted, fontSize: 12),
           ),
           const SizedBox(height: 20),
@@ -156,7 +184,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: Text(
-                  _currentQuestion == widget.lesson.quiz.length - 1
+                  _currentQuestion == _questions.length - 1
                       ? 'Tapusin'
                       : 'Susunod',
                 ),
