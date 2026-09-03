@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../constants/app_colors.dart';
 import '../models/module_model.dart';
-import '../models/lesson_model.dart';
 import '../models/user_progress_model.dart';
 import '../services/progress_service.dart';
 import '../widgets/module_widgets.dart';
@@ -65,7 +63,7 @@ class _QuizHomeScreenState extends State<QuizHomeScreen> {
 
                 return ListView.separated(
                   itemCount: kModules.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 14),
+                  separatorBuilder: (_, _) => const SizedBox(height: 14),
                   itemBuilder: (context, index) {
                     final module = kModules[index];
                     // Use the module's first lesson to represent overall

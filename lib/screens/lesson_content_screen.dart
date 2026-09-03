@@ -5,6 +5,7 @@ import '../models/module_model.dart';
 import '../models/lesson_model.dart';
 import '../services/progress_service.dart';
 import '../widgets/module_widgets.dart';
+import '../widgets/sign_video_player.dart';
 import 'quiz_screen.dart';
 
 class LessonContentScreen extends StatefulWidget {
@@ -156,7 +157,7 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: SingleChildScrollView(
@@ -170,10 +171,11 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                         color: Colors.white24,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
-                        Icons.play_circle_outline,
-                        color: AppColors.textWhite,
-                        size: 48,
+                      child: SignVideoPlayer(
+                        key: ValueKey('${sign.id}_$_selectedVariant'),
+                        assetPath: _selectedVariant == 2
+                            ? sign.videoAssetPathVar2
+                            : sign.videoAssetPath,
                       ),
                     ),
                     if (sign.hasVariant) ...[

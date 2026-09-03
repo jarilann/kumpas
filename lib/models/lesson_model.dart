@@ -6,10 +6,25 @@ class SignModel {
   final String meaning; // "Kahulugan"
   final String description; // "Deskripsyon"
 
-  /// Path to the real demonstration video once it exists (e.g.
-  /// 'assets/videos/alpabeto_a.mp4'). Null while content is still
-  /// placeholder/dummy.
+  /// Path to the demonstration video bundled as a local Flutter asset
+  /// (e.g. 'assets/videos/modyul_1/alpabeto/a.mp4') — must be listed
+  /// under pubspec.yaml's `assets:`. Resolved directly via
+  /// VideoPlayerController.asset() at runtime. This is always "Var 1"
+  /// when [videoAssetPathVar2] is also set. Null while a sign has no
+  /// video bundled yet.
   final String? videoAssetPath;
+
+  /// Path to a second, alternate demonstration video for signs that
+  /// have more than one accepted way of signing them (e.g. regional
+  /// variants) — see mockup screen 9, which shows "Var 1" / "Var 2"
+  /// buttons. Leave null for signs that only have one version; the
+  /// lesson screen only shows the variant picker when this is set.
+  /// Naming convention: same path as [videoAssetPath], with "_var2"
+  /// appended before the extension, e.g.
+  /// 'assets/videos/modyul_1/alpabeto/a.mp4' -> '..._var2.mp4'.
+  final String? videoAssetPathVar2;
+
+  bool get hasVariant => videoAssetPathVar2 != null;
 
   const SignModel({
     required this.id,
@@ -17,6 +32,7 @@ class SignModel {
     required this.meaning,
     required this.description,
     this.videoAssetPath,
+    this.videoAssetPathVar2,
   });
 }
 

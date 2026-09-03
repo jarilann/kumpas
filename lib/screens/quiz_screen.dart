@@ -106,7 +106,7 @@ class _QuizScreenState extends State<QuizScreen> {
           Expanded(
             child: ListView.separated(
               itemCount: question.options.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final isSelected = _selectedOption == index;
                 final isCorrectOption = index == question.correctIndex;
@@ -118,7 +118,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   } else if (isSelected) {
                     bgColor = Colors.redAccent;
                   } else {
-                    bgColor = AppColors.accentYellow.withOpacity(0.4);
+                    bgColor = AppColors.accentYellow.withValues(alpha: 0.4);
                   }
                 }
 
