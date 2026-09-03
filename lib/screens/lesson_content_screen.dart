@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 import '../constants/app_colors.dart';
 import '../models/module_model.dart';
@@ -27,76 +25,18 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
   int _currentIndex = 0;
   bool _loading = true;
   bool _alreadyViewedAll = false;
-  VideoPlayerController? _videoController;
-  bool _videoInitialized = false;
-  bool _isVideoAvailable = false;
+
+  /// 1 or 2 — which variant is currently shown, for signs that have
+  /// more than one accepted version (see [SignModel.hasVariant]).
+  int _selectedVariant = 1;
 
   @override
   void initState() {
     super.initState();
     _checkExistingProgress();
-    _initializeVideo();
-  }
-
-  @override
-  void dispose() {
-    _videoController?.dispose();
-    super.dispose();
-  }
-
-  Future<void> _initializeVideo() async {
-    final sign = widget.lesson.signs[_currentIndex];
-
-    // Check if we have a video asset path (could be asset or network)
-    if (sign.videoAssetPath != null && sign.videoAssetPath!.isNotEmpty) {
-      try {
-        // Try to get download URL from Firebase Storage if it's a storage path
-        final videoUrl = await _getVideoUrl(sign.videoAssetPath!);
-
-        // Use the new networkUrl constructor (replaces deprecated .network)
-        _videoController = VideoPlayerController.networkUrl(Uri.parse(videoUrl))
-          ..initialize().then((_) {
-            setState(() {
-              _videoInitialized = true;
-              _isVideoAvailable = true;
-            });
-          });
-      } catch (e) {
-        // Fallback to asset if network fails
-        try {
-          _videoController = VideoPlayerController.asset(sign.videoAssetPath!)
-            ..initialize().then((_) {
-              setState(() {
-                _videoInitialized = true;
-                _isVideoAvailable = true;
-              });
-            });
-        } catch (e2) {
-          // Keep as not available
-          setState(() {
-            _isVideoAvailable = false;
-          });
-        }
-      }
-    }
-
-    setState(() {
-      _loading = false;
-    });
-  }
-
-  Future<String> _getVideoUrl(String path) async {
-    // If path looks like a Firebase Storage path (starts with videos/ or similar)
-    if (path.startsWith('videos/') || path.contains('/')) {
-      final ref = FirebaseStorage.instance.ref().child(path);
-      return await ref.getDownloadURL();
-    }
-    // Otherwise treat as direct URL
-    return path;
   }
 
   Future<void> _checkExistingProgress() async {
-    // ... existing progress checking code remains the same ...
     final states = await ProgressService.instance.getLessonStates(kModules);
     final state = states[widget.lesson.id];
 
@@ -136,12 +76,13 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
     if (_loading) {
       return const Scaffold(
         backgroundColor: AppColors.primaryBlue,
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.textWhite),
+        ),
       );
     }
 
     if (_alreadyViewedAll) {
-      // ... existing already viewed all UI remains the same ...
       return ModuleScaffold(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -215,28 +156,48 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: Colors.white.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // VIDEO PLAYER SECTION
                     Container(
-                      height: 220,
+                      height: 180,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: Colors.white24,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: _isVideoAvailable && _videoInitialized
-                          ? AspectRatio(
-                              aspectRatio: _videoController!.value.aspectRatio,
-                              child: VideoPlayer(_videoController!),
-                            )
-                          : _videoAvailablePlaceholder(),
+                      child: const Icon(
+                        Icons.play_circle_outline,
+                        color: AppColors.textWhite,
+                        size: 48,
+                      ),
                     ),
+                    if (sign.hasVariant) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _VariantButton(
+                              label: 'Var 1',
+                              selected: _selectedVariant == 1,
+                              onTap: () => setState(() => _selectedVariant = 1),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _VariantButton(
+                              label: 'Var 2',
+                              selected: _selectedVariant == 2,
+                              onTap: () => setState(() => _selectedVariant = 2),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 16),
                     Text(
                       'Kahulugan: ${sign.meaning}',
@@ -265,7 +226,10 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
             children: [
               if (_currentIndex > 0)
                 OutlinedButton(
-                  onPressed: _previousSign,
+                  onPressed: () => setState(() {
+                    _currentIndex--;
+                    _selectedVariant = 1;
+                  }),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textWhite,
                     side: const BorderSide(color: AppColors.textWhite),
@@ -281,7 +245,10 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                   if (isLast) {
                     _goToQuiz();
                   } else {
-                    _nextSign();
+                    setState(() {
+                      _currentIndex++;
+                      _selectedVariant = 1;
+                    });
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -296,41 +263,32 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
       ),
     );
   }
+}
 
-  Widget _videoAvailablePlaceholder() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(Icons.videocam, size: 48, color: AppColors.textWhite),
-        const SizedBox(height: 8),
-        Text(
-          'Video available',
-          style: TextStyle(
-            color: AppColors.textWhite.withValues(alpha: 0.7),
-            fontSize: 14,
-          ),
-        ),
-      ],
+/// The "Var 1" / "Var 2" toggle shown for signs with more than one
+/// accepted version — see mockup screen 9.
+class _VariantButton extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _VariantButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        backgroundColor: selected ? AppColors.accentYellow : Colors.transparent,
+        foregroundColor: selected ? AppColors.primaryBlue : AppColors.textWhite,
+        side: const BorderSide(color: AppColors.textWhite),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+      ),
+      child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
     );
-  }
-
-  void _previousSign() {
-    _videoController?.pause();
-    setState(() {
-      if (_currentIndex > 0) {
-        _currentIndex--;
-        _initializeVideo(); // Reinitialize video for new sign
-      }
-    });
-  }
-
-  void _nextSign() {
-    _videoController?.pause();
-    setState(() {
-      if (_currentIndex < widget.lesson.signs.length - 1) {
-        _currentIndex++;
-        _initializeVideo(); // Reinitialize video for new sign
-      }
-    });
   }
 }
