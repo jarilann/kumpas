@@ -5,6 +5,7 @@ import '../models/module_model.dart';
 import '../models/user_progress_model.dart';
 import '../services/progress_service.dart';
 import '../widgets/module_widgets.dart';
+import 'lesson_content_screen.dart';
 
 /// Shows the lessons within a single [module] (e.g. Modyul 1's
 /// "Alpabeto" and "Numero"), each downloadable/lockable on its own —
@@ -25,6 +26,12 @@ class _LessonListScreenState extends State<LessonListScreen> {
   void initState() {
     super.initState();
     _statesFuture = ProgressService.instance.getLessonStates(kModules);
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      _statesFuture = ProgressService.instance.getLessonStates(kModules);
+    });
   }
 
   @override
@@ -71,19 +78,17 @@ class _LessonListScreenState extends State<LessonListScreen> {
                     return _LessonTile(
                       title: lesson.title,
                       state: state,
-                      onTap: () {
+                      onTap: () async {
                         if (!state.unlocked) return;
-                        // Lesson content player (mockup screens 8/9)
-                        // is built in a later step — for now just
-                        // confirm the tap landed on an unlocked
-                        // lesson.
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${lesson.title} — lesson content malapit na!',
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => LessonContentScreen(
+                              module: widget.module,
+                              lesson: lesson,
                             ),
                           ),
                         );
+                        _refresh();
                       },
                     );
                   },

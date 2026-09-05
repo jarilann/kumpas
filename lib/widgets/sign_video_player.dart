@@ -88,6 +88,7 @@ class _SignVideoPlayerState extends State<SignVideoPlayer> {
         _controller = controller;
         _loading = false;
       });
+      controller.play();
     } catch (_) {
       // Most commonly the asset isn't bundled yet (not listed under
       // pubspec.yaml's assets:, or the .mp4 file hasn't been added).

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../constants/app_colors.dart';
 import '../models/module_model.dart';
 import '../models/lesson_model.dart';
@@ -44,7 +45,8 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
 
     final allSignIds = widget.lesson.signs.map((s) => s.id).toSet();
     final viewedIds = state?.signsViewed.toSet() ?? {};
-    final viewedAll = allSignIds.isNotEmpty && allSignIds.every(viewedIds.contains);
+    final viewedAll =
+        allSignIds.isNotEmpty && allSignIds.every(viewedIds.contains);
 
     setState(() {
       _alreadyViewedAll = viewedAll && state?.completed != true;
@@ -55,7 +57,8 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
   void _goToQuiz() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => QuizScreen(module: widget.module, lesson: widget.lesson),
+        builder: (_) =>
+            QuizScreen(module: widget.module, lesson: widget.lesson),
       ),
     );
   }
@@ -74,7 +77,9 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
     if (_loading) {
       return const Scaffold(
         backgroundColor: AppColors.primaryBlue,
-        body: Center(child: CircularProgressIndicator(color: AppColors.textWhite)),
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.textWhite),
+        ),
       );
     }
 
@@ -133,7 +138,10 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
         children: [
           Text(
             '${widget.module.number} - ${widget.lesson.title}',
-            style: const TextStyle(color: AppColors.textWhiteMuted, fontSize: 13),
+            style: const TextStyle(
+              color: AppColors.textWhiteMuted,
+              fontSize: 13,
+            ),
           ),
           Text(
             'Senyas: ${sign.label}',
@@ -197,7 +205,8 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                               child: _VariantButton(
                                 label: 'Var 3',
                                 selected: _selectedVariant == 3,
-                                onTap: () => setState(() => _selectedVariant = 3),
+                                onTap: () =>
+                                    setState(() => _selectedVariant = 3),
                               ),
                             ),
                           ],

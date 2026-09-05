@@ -2,10 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';
+import '../models/module_model.dart';
+import '../models/user_progress_model.dart';
+import '../services/progress_service.dart';
 import 'module_list_screen.dart';
 import 'quiz_home_screen.dart';
 import 'progress_screen.dart';
 import 'badges_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,10 +19,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // TODO: replace with real data from ProgressService once it exists.
-  // Placeholder values match mockup screen 4 ("Layunin Ngayon" card).
-  final String _currentGoalTitle = 'Kumpletuhin ang Modyul 1';
-  final double _currentGoalPercent = 0.60;
+  late Future<Map<String, LessonProgress>> _statesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _statesFuture = ProgressService.instance.getLessonStates(kModules);
+  }
 
   String get _displayName {
     final name = FirebaseAuth.instance.currentUser?.displayName;
@@ -29,6 +36,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   bool get _isGuest => FirebaseAuth.instance.currentUser?.isAnonymous ?? false;
+
+  void _showInfoDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Tungkol sa KumpasKonek'),
+        content: const Text(
+          'Inklusibong Komunikasyon at Koneksyon sa Bawat Sensyas at '
+          'Kumpas.\n\nMatuto ng Filipino Sign Language sa pamamagitan ng '
+          'mga modyul, video demonstrasyon, at pagsusulit.\n\nBersyon 1.0.0',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Icons.info_outline,
                         color: AppColors.textWhite,
                       ),
-                      onPressed: () {
-                        // TODO: wire up info dialog/screen
-                      },
+                      onPressed: _showInfoDialog,
                     ),
 
                     IconButton(
@@ -71,7 +96,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: AppColors.textWhite,
                       ),
                       onPressed: () {
-                        // TODO: wire up settings screen
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SettingsScreen(),
+                          ),
+                        );
                       },
                     ),
 
@@ -153,70 +182,94 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
 
                 // ==================================================
-                // LAYUNIN NGAYON (current goal card)
+                // LAYUNIN NGAYON (current goal card) — real progress
+                // from ProgressService: the first module that's
+                // unlocked but not yet fully completed.
                 // ==================================================
 
-                Container(
-                  padding: const EdgeInsets.all(16),
+                FutureBuilder<Map<String, LessonProgress>>(
+                  future: _statesFuture,
+                  builder: (context, snapshot) {
+                    final states = snapshot.data;
+                    String goalTitle = 'Kumpletuhin ang Modyul 1';
+                    double goalPercent = 0;
 
-                  decoration: BoxDecoration(
-                    color: AppColors.accentYellow,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                    if (states != null) {
+                      final service = ProgressService.instance;
+                      ModuleModel? pendingModule;
+                      for (final m in kModules) {
+                        if (service.isModuleUnlocked(m, states) &&
+                            !service.isModuleCompleted(m, states)) {
+                          pendingModule = m;
+                          break;
+                        }
+                      }
+                      if (pendingModule != null) {
+                        goalTitle = 'Kumpletuhin ang ${pendingModule.number}';
+                        goalPercent =
+                            service.moduleProgressFraction(pendingModule, states);
+                      } else {
+                        // Every unlocked module is completed.
+                        goalTitle = 'Nakumpleto mo na ang lahat ng modyul!';
+                        goalPercent = 1;
+                      }
+                    }
 
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Layunin Ngayon',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textWhite,
-                        ),
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.accentYellow,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-
-                      const SizedBox(height: 4),
-
-                      Text(
-                        _currentGoalTitle,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textWhite,
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: LinearProgressIndicator(
-                                value: _currentGoalPercent,
-                                minHeight: 10,
-                                backgroundColor: Colors.white54,
-                                valueColor: const AlwaysStoppedAnimation(
-                                  AppColors.progressBar,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(width: 10),
-
-                          Text(
-                            '${(_currentGoalPercent * 100).round()}%',
-                            style: const TextStyle(
+                          const Text(
+                            'Layunin Ngayon',
+                            style: TextStyle(
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textWhite,
                             ),
                           ),
+                          const SizedBox(height: 4),
+                          Text(
+                            goalTitle,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textWhite,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: LinearProgressIndicator(
+                                    value: goalPercent,
+                                    minHeight: 10,
+                                    backgroundColor: Colors.white54,
+                                    valueColor: const AlwaysStoppedAnimation(
+                                      AppColors.progressBar,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                '${(goalPercent * 100).round()}%',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textWhite,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 24),

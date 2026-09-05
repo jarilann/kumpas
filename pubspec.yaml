@@ -67,6 +67,29 @@ flutter:
   assets:
     - assets/images/
     - assets/videos/
+    - assets/videos/modyul_1/alpabeto/
+    - assets/videos/modyul_1/numero/
+    - assets/videos/modyul_2/magalang_na_pananalita/
+    - assets/videos/modyul_2/pagbati/
+    - assets/videos/modyul_3/damdamin_at_emosyon/
+    - assets/videos/modyul_3/mga_kulay/
+    - assets/videos/modyul_4/komunidad/
+    - assets/videos/modyul_4/paaralan/
+    - assets/videos/modyul_4/pamilya/
+    - assets/videos/modyul_5/mga_direksyon/
+    - assets/videos/modyul_5/mga_lugar_araw_araw/
+    - assets/videos/modyul_5/mga_simpleng_tanong/
+    - assets/videos/modyul_5/paghingi_ng_tulong/
+    - assets/videos/modyul_6/bahagi_ng_katawan/
+    - assets/videos/modyul_6/damit/
+    - assets/videos/modyul_6/personal_na_kalinisan/
+    - assets/videos/modyul_7/inom/
+    - assets/videos/modyul_7/pagkain/
+    - assets/videos/modyul_8/araw_ng_linggo/
+    - assets/videos/modyul_8/buwan/
+    - assets/videos/modyul_8/iskedyul/
+    - assets/videos/modyul_8/oras/
+    - assets/videos/modyul_8/petsa/
   fonts:
     - family: Chewy
       fonts:
