@@ -5,6 +5,7 @@ import '../models/module_model.dart';
 import '../models/lesson_model.dart';
 import '../services/progress_service.dart';
 import '../widgets/module_widgets.dart';
+import '../widgets/sign_video_player.dart';
 import 'quiz_result_screen.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -48,6 +49,16 @@ class _QuizScreenState extends State<QuizScreen> {
         correctIndex: newCorrectIndex,
       );
     }).toList();
+  }
+
+  /// The question shows "Anong letra/senyas ito?" (What letter/sign is
+  /// this?) — it needs the actual sign's video as visual reference, so
+  /// this looks up the matching [SignModel] by [QuizQuestionModel.signLabel].
+  SignModel? _signFor(String label) {
+    for (final s in widget.lesson.signs) {
+      if (s.label == label) return s;
+    }
+    return null;
   }
 
   void _selectOption(int optionIndex) {
@@ -99,6 +110,7 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     final question = _questions[_currentQuestion];
+    final referencedSign = _signFor(question.signLabel);
 
     return ModuleScaffold(
       child: Column(
@@ -121,7 +133,25 @@ class _QuizScreenState extends State<QuizScreen> {
             'Tanong ${_currentQuestion + 1} / ${_questions.length}',
             style: const TextStyle(color: AppColors.textWhiteMuted, fontSize: 12),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
+          if (referencedSign != null)
+            Container(
+              height: 200,
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: SignVideoPlayer(
+                // Keyed on the question index (not just the sign) so a
+                // repeated sign across questions still gets a fresh,
+                // autoplaying-from-start controller each time.
+                key: ValueKey('quiz_${_currentQuestion}_${referencedSign.id}'),
+                assetPath: referencedSign.videoAssetPath,
+              ),
+            ),
+          const SizedBox(height: 16),
           Text(
             question.question,
             style: const TextStyle(

@@ -87,10 +87,38 @@ class _BadgeTile extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            earned ? badge.icon : Icons.lock_rounded,
-            size: 40,
-            color: earned ? badge.color : Colors.grey.shade400,
+          Expanded(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Opacity(
+                  opacity: earned ? 1.0 : 0.25,
+                  child: earned
+                      ? Image.asset(badge.imageAsset, fit: BoxFit.contain)
+                      : ColorFiltered(
+                          // Grayscale the artwork while locked, so the
+                          // badge's real shape is still a preview of
+                          // what's earned, not just a blank icon.
+                          colorFilter: const ColorFilter.matrix(<double>[
+                            0.2126, 0.7152, 0.0722, 0, 0,
+                            0.2126, 0.7152, 0.0722, 0, 0,
+                            0.2126, 0.7152, 0.0722, 0, 0,
+                            0, 0, 0, 1, 0,
+                          ]),
+                          child: Image.asset(
+                            badge.imageAsset,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                ),
+                if (!earned)
+                  const Icon(
+                    Icons.lock_rounded,
+                    size: 28,
+                    color: Colors.grey,
+                  ),
+              ],
+            ),
           ),
           const SizedBox(height: 10),
           Text(

@@ -35,6 +35,14 @@ class ProgressService {
   /// very first lesson as unlocked-by-default the first time this is
   /// called for a user. Returns an empty map if the user isn't
   /// signed in.
+  ///
+  /// Resilient to being offline: Firestore's default `.get()` already
+  /// falls back to the local cache when the server is unreachable
+  /// (see the `persistenceEnabled` setting in main.dart), but if
+  /// there's no cache yet either (e.g. this device has never synced
+  /// this user's progress), this still returns sensible seeded
+  /// defaults instead of throwing and leaving a caller's loading
+  /// spinner stuck forever.
   Future<Map<String, LessonProgress>> getLessonStates(
     List<ModuleModel> modules,
   ) async {
@@ -42,8 +50,24 @@ class ProgressService {
     if (collection == null) return {};
 
     final lessons = _flattenLessons(modules);
-    final snapshot = await collection.get();
-    final existing = {for (final doc in snapshot.docs) doc.id: doc.data()};
+    Map<String, dynamic> existing = {};
+    try {
+      final snapshot = await collection.get();
+      existing = {for (final doc in snapshot.docs) doc.id: doc.data()};
+    } catch (_) {
+      try {
+        // Explicitly ask for cache-only, in case the plain .get()
+        // above failed for a reason other than "offline with no
+        // cache" (e.g. it hung waiting on the server rather than
+        // falling back automatically).
+        final cached = await collection.get(const GetOptions(source: Source.cache));
+        existing = {for (final doc in cached.docs) doc.id: doc.data()};
+      } catch (_) {
+        // Genuinely nothing available (offline + never synced on
+        // this device) — fall through with an empty map, which
+        // seeds every lesson to its default below.
+      }
+    }
 
     final result = <String, LessonProgress>{};
     for (var i = 0; i < lessons.length; i++) {
@@ -59,7 +83,19 @@ class ProgressService {
   Future<void> _saveLesson(String lessonId, LessonProgress progress) async {
     final collection = _collection;
     if (collection == null) return;
-    await collection.doc(lessonId).set(progress.toMap());
+    try {
+      // With persistence enabled, this resolves as soon as the write
+      // lands in the local cache — it does not wait for the server —
+      // so this completes quickly even offline, and syncs to
+      // Firestore automatically once connectivity returns.
+      await collection.doc(lessonId).set(progress.toMap());
+    } catch (_) {
+      // Best-effort: callers of markSignViewed/submitQuizResult treat
+      // saving as fire-and-forget, so a save failure here shouldn't
+      // surface as a crash — the user's in-session progress (current
+      // sign index, quiz score) still works via local widget state
+      // regardless of whether this particular write landed.
+    }
   }
 
   Future<void> markSignViewed(

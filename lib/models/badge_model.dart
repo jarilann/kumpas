@@ -1,83 +1,47 @@
-import 'package:flutter/material.dart';
 import 'module_model.dart';
 import 'user_progress_model.dart';
 
 /// One achievement badge — see mockup screen 14 ("Mga Badges").
-/// [isEarned] is computed from real Firestore lesson-progress state,
-/// not stored separately.
+///
+/// There is exactly one badge per module (see [kBadgeDefinitions]),
+/// using the real artwork in assets/images/badges/ — badge_modyul_1.png
+/// through badge_modyul_8.png, one per entry in [kModules]. A badge is
+/// [isEarned] once every lesson in its module is completed; this is
+/// computed live from real Firestore lesson-progress state, not
+/// stored separately.
 class BadgeDefinition {
+  final String moduleId;
   final String title;
-  final IconData icon;
-  final Color color;
+
+  /// Path to the badge artwork, e.g.
+  /// 'assets/images/badges/badge_modyul_1.png'. Must be covered by
+  /// pubspec.yaml's `assets:` — see the `assets/images/badges/` entry.
+  final String imageAsset;
+
   final bool Function(Map<String, LessonProgress> states) isEarned;
 
   const BadgeDefinition({
+    required this.moduleId,
     required this.title,
-    required this.icon,
-    required this.color,
+    required this.imageAsset,
     required this.isEarned,
   });
 }
 
-bool _lessonCompleted(Map<String, LessonProgress> states, String lessonId) {
-  return states[lessonId]?.completed == true;
+bool _moduleCompleted(Map<String, LessonProgress> states, ModuleModel module) {
+  return module.lessons.every((l) => states[l.id]?.completed == true);
 }
 
-bool _allCompleted(Map<String, LessonProgress> states, List<String> lessonIds) {
-  return lessonIds.every((id) => _lessonCompleted(states, id));
-}
-
-/// The six badges shown in the mockup, each tied to a real progress
-/// condition:
-///  - Alpabeto / Numero / Pagbati: completing that specific lesson.
-///  - Idyoma: no dedicated idioms lesson exists in the current
-///    content, so this is earned by completing all of Modyul 2
-///    (greetings + polite expressions) — the closest equivalent to
-///    "mastering expressions" available today.
-///  - Unang Hakbang ("First Step"): completing any lesson at all.
-///  - Mahusay na Tagasenyas ("Great Signer"): completing every
-///    lesson across every module.
+/// One badge per module in [kModules], in the same order — earned by
+/// completing every lesson within that module.
 final List<BadgeDefinition> kBadgeDefinitions = [
-  BadgeDefinition(
-    title: 'Dalubhasa sa Alpabeto',
-    icon: Icons.diamond_rounded,
-    color: Colors.lightBlueAccent,
-    isEarned: (states) => _lessonCompleted(states, 'alpabeto'),
-  ),
-  BadgeDefinition(
-    title: 'Dalubhasa sa Numero',
-    icon: Icons.hexagon_rounded,
-    color: Colors.amber,
-    isEarned: (states) => _lessonCompleted(states, 'numero'),
-  ),
-  BadgeDefinition(
-    title: 'Dalubhasa sa Pagbati',
-    icon: Icons.diamond_rounded,
-    color: Colors.purpleAccent,
-    isEarned: (states) => _lessonCompleted(states, 'pagbati'),
-  ),
-  BadgeDefinition(
-    title: 'Dalubhasa sa Idyoma',
-    icon: Icons.diamond_rounded,
-    color: Colors.teal,
-    isEarned: (states) =>
-        _allCompleted(states, ['pagbati', 'magalang_na_pananalita']),
-  ),
-  BadgeDefinition(
-    title: 'Unang Hakbang',
-    icon: Icons.star_rounded,
-    color: Colors.amber,
-    isEarned: (states) => states.values.any((s) => s.completed),
-  ),
-  BadgeDefinition(
-    title: 'Mahusay na Tagasenyas',
-    icon: Icons.emoji_events_rounded,
-    color: Colors.amber,
-    isEarned: (states) => _allCompleted(
-      states,
-      [for (final m in kModules) for (final l in m.lessons) l.id],
+  for (var i = 0; i < kModules.length; i++)
+    BadgeDefinition(
+      moduleId: kModules[i].id,
+      title: 'Dalubhasa sa ${kModules[i].title}',
+      imageAsset: 'assets/images/badges/badge_modyul_${i + 1}.png',
+      isEarned: (states) => _moduleCompleted(states, kModules[i]),
     ),
-  ),
 ];
 
 List<BadgeDefinition> earnedBadges(Map<String, LessonProgress> states) {
