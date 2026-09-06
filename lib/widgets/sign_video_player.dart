@@ -7,11 +7,11 @@ import '../constants/app_colors.dart';
 /// states:
 ///  - no path / asset not bundled yet -> static placeholder icon
 ///  - loading -> spinner
-///  - ready -> tap-to-play video, looping
+///  - ready -> autoplaying, looping video with playback controls
 ///
-/// Used inside a fixed-height box (see LessonContentScreen), so it
-/// always fills its parent rather than sizing itself to the video's
-/// native aspect ratio.
+/// Renders itself as a Column (video area + control bar below), so
+/// give it a bounded height or wrap it in Expanded/AspectRatio rather
+/// than a fixed-height box sized for video-only content.
 ///
 /// NOTE: every path this widget is given must also be listed (or
 /// covered by a folder entry) under pubspec.yaml's `assets:` — see
@@ -32,6 +32,10 @@ class _SignVideoPlayerState extends State<SignVideoPlayer> {
   VideoPlayerController? _controller;
   bool _loading = true;
   bool _notFound = false;
+
+  // 0.5 = slow motion, 1.0 = normal, 1.5 = fast. Tapping an active
+  // speed button again resets to 1.0 — see _setSpeed.
+  double _speed = 1.0;
 
   @override
   void initState() {
@@ -64,6 +68,7 @@ class _SignVideoPlayerState extends State<SignVideoPlayer> {
     setState(() {
       _loading = true;
       _notFound = false;
+      _speed = 1.0;
     });
 
     if (path == null) {
@@ -102,6 +107,32 @@ class _SignVideoPlayerState extends State<SignVideoPlayer> {
     }
   }
 
+  void _togglePlay() {
+    final controller = _controller;
+    if (controller == null) return;
+    setState(() {
+      controller.value.isPlaying ? controller.pause() : controller.play();
+    });
+  }
+
+  void _stop() {
+    final controller = _controller;
+    if (controller == null) return;
+    setState(() {
+      controller.pause();
+      controller.seekTo(Duration.zero);
+    });
+  }
+
+  void _setSpeed(double target) {
+    final controller = _controller;
+    if (controller == null) return;
+    // Tapping the already-active speed button resets to normal speed.
+    final next = _speed == target ? 1.0 : target;
+    controller.setPlaybackSpeed(next);
+    setState(() => _speed = next);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -127,27 +158,142 @@ class _SignVideoPlayerState extends State<SignVideoPlayer> {
     }
 
     final controller = _controller!;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          controller.value.isPlaying ? controller.pause() : controller.play();
-        });
-      },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: controller.value.size.width,
-            height: controller.value.size.height,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                VideoPlayer(controller),
-                if (!controller.value.isPlaying)
-                  const Icon(Icons.play_circle_fill, color: Colors.white70, size: 48),
-              ],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: _togglePlay,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: controller.value.size.width,
+                  height: controller.value.size.height,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      VideoPlayer(controller),
+                      if (!controller.value.isPlaying)
+                        const Icon(
+                          Icons.play_circle_fill,
+                          color: Colors.white70,
+                          size: 48,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
             ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _ControlButton(
+              icon: Icons.replay,
+              tooltip: 'Stop',
+              onTap: _stop,
+            ),
+            const SizedBox(width: 10),
+            _ControlButton(
+              icon: controller.value.isPlaying
+                  ? Icons.pause
+                  : Icons.play_arrow,
+              tooltip: controller.value.isPlaying ? 'Pause' : 'Play',
+              onTap: _togglePlay,
+              highlighted: true,
+            ),
+            const SizedBox(width: 10),
+            _SpeedButton(
+              label: '0.5x',
+              active: _speed == 0.5,
+              onTap: () => _setSpeed(0.5),
+            ),
+            const SizedBox(width: 10),
+            _SpeedButton(
+              label: '1.5x',
+              active: _speed == 1.5,
+              onTap: () => _setSpeed(1.5),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Round icon button used for Play/Pause/Stop in the video controls.
+class _ControlButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+  final bool highlighted;
+
+  const _ControlButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+    this.highlighted = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: highlighted ? AppColors.accentYellow : Colors.white24,
+          ),
+          child: Icon(
+            icon,
+            size: 20,
+            color: highlighted ? AppColors.primaryBlue : AppColors.textWhite,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Pill-shaped "0.5x" / "1.5x" playback-speed toggle.
+class _SpeedButton extends StatelessWidget {
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  const _SpeedButton({
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: active ? AppColors.accentYellow : Colors.white24,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: active ? AppColors.primaryBlue : AppColors.textWhite,
           ),
         ),
       ),

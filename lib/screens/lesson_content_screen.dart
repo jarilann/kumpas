@@ -130,7 +130,9 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
     }
 
     final sign = widget.lesson.signs[_currentIndex];
-    final isLast = _currentIndex == widget.lesson.signs.length - 1;
+    final total = widget.lesson.signs.length;
+    final isLast = _currentIndex == total - 1;
+    final progress = total > 0 ? (_currentIndex + 1) / total : 0.0;
 
     return ModuleScaffold(
       child: Column(
@@ -151,6 +153,33 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
               fontWeight: FontWeight.w800,
             ),
           ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 10,
+                    backgroundColor: Colors.white24,
+                    valueColor: const AlwaysStoppedAnimation(
+                      AppColors.progressBar,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                '${_currentIndex + 1} / $total',
+                style: const TextStyle(
+                  color: AppColors.textWhiteMuted,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
           Expanded(
             child: Container(
@@ -160,79 +189,63 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 180,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: SignVideoPlayer(
-                        key: ValueKey('${sign.id}_$_selectedVariant'),
-                        assetPath: switch (_selectedVariant) {
-                          3 => sign.videoAssetPathVar3,
-                          2 => sign.videoAssetPathVar2,
-                          _ => sign.videoAssetPath,
-                        },
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: AspectRatio(
+                        aspectRatio: 9 / 12,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: SignVideoPlayer(
+                            key: ValueKey('${sign.id}_$_selectedVariant'),
+                            assetPath: switch (_selectedVariant) {
+                              3 => sign.videoAssetPathVar3,
+                              2 => sign.videoAssetPathVar2,
+                              _ => sign.videoAssetPath,
+                            },
+                          ),
+                        ),
                       ),
                     ),
-                    if (sign.hasVariant) ...[
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _VariantButton(
-                              label: 'Var 1',
-                              selected: _selectedVariant == 1,
-                              onTap: () => setState(() => _selectedVariant = 1),
-                            ),
+                  ),
+                  if (sign.hasVariant) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _VariantButton(
+                            label: 'Var 1',
+                            selected: _selectedVariant == 1,
+                            onTap: () => setState(() => _selectedVariant = 1),
                           ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _VariantButton(
+                            label: 'Var 2',
+                            selected: _selectedVariant == 2,
+                            onTap: () => setState(() => _selectedVariant = 2),
+                          ),
+                        ),
+                        if (sign.hasThirdVariant) ...[
                           const SizedBox(width: 12),
                           Expanded(
                             child: _VariantButton(
-                              label: 'Var 2',
-                              selected: _selectedVariant == 2,
-                              onTap: () => setState(() => _selectedVariant = 2),
+                              label: 'Var 3',
+                              selected: _selectedVariant == 3,
+                              onTap: () =>
+                                  setState(() => _selectedVariant = 3),
                             ),
                           ),
-                          if (sign.hasThirdVariant) ...[
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _VariantButton(
-                                label: 'Var 3',
-                                selected: _selectedVariant == 3,
-                                onTap: () =>
-                                    setState(() => _selectedVariant = 3),
-                              ),
-                            ),
-                          ],
                         ],
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-                    Text(
-                      'Kahulugan: ${sign.meaning}',
-                      style: const TextStyle(
-                        color: AppColors.textWhite,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      sign.description,
-                      style: const TextStyle(
-                        color: AppColors.textWhiteMuted,
-                        fontSize: 14,
-                        height: 1.4,
-                      ),
+                      ],
                     ),
                   ],
-                ),
+                ],
               ),
             ),
           ),
@@ -253,9 +266,13 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                 ),
               const Spacer(),
               ElevatedButton(
-                onPressed: () async {
-                  await _markCurrentSignViewed();
-                  if (!mounted) return;
+                onPressed: () {
+                  // Fire-and-forget: saving progress is a Firestore
+                  // round-trip, and shouldn't block the UI from
+                  // advancing. Blocking here previously made the
+                  // button feel unresponsive and, worse, let a fast
+                  // second tap race the first and skip a sign.
+                  _markCurrentSignViewed();
 
                   if (isLast) {
                     _goToQuiz();
