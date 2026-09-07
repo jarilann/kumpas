@@ -143,13 +143,8 @@ class _LessonTile extends StatelessWidget {
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(width: 6),
-                        if (state.unlocked)
-                          const Icon(
-                            Icons.download_rounded,
-                            color: AppColors.textWhite,
-                            size: 16,
-                          ),
+                        
+                        
                       ],
                     ),
                     if (showProgressBar) ...[
