@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kumpaskonek_12/main.dart';
+import 'package:kumpaskonek/main.dart';
 
 void main() {
   testWidgets('App loads splash screen test', (WidgetTester tester) async {
