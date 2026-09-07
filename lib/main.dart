@@ -30,6 +30,7 @@ class KumpasKonekApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      title: 'KumpasKonek',
       debugShowCheckedModeBanner: false,
       home: AuthWrapper(),
     );
