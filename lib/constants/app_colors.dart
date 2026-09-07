@@ -8,5 +8,5 @@ class AppColors {
   static const Color deepOrange = Color(0xFFE2861F);
   static const Color textWhite = Colors.white;
   static const Color textWhiteMuted = Colors.white70;
-  static const Color progressBar = Color(0xFF6FFF4B);
+  static const Color progressBar = Color(0xFF025379);
 }
