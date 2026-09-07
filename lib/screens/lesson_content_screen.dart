@@ -164,7 +164,7 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                     minHeight: 10,
                     backgroundColor: Colors.white24,
                     valueColor: const AlwaysStoppedAnimation(
-                      AppColors.progressBar,
+                      Color(0xFF6FFF4B),
                     ),
                   ),
                 ),
