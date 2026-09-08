@@ -17,6 +17,18 @@ class ProgressService {
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  final Map<String, LessonProgress> _memoryStates = {};
+  String? _memoryUid;
+  bool _memoryLoaded = false;
+
+  void _ensureMemoryUser() {
+    final uid = _uid;
+    if (_memoryUid == uid) return;
+    _memoryStates.clear();
+    _memoryUid = uid;
+    _memoryLoaded = false;
+  }
+
   String? get _uid => FirebaseAuth.instance.currentUser?.uid;
 
   CollectionReference<Map<String, dynamic>>? get _collection {
@@ -36,9 +48,9 @@ class ProgressService {
   /// called for a user. Returns an empty map if the user isn't
   /// signed in.
   ///
-  /// Resilient to being offline: Firestore's default `.get()` already
+  /// Resilient to being offline: Firestore's default .get() already
   /// falls back to the local cache when the server is unreachable
-  /// (see the `persistenceEnabled` setting in main.dart), but if
+  /// (see the persistenceEnabled setting in main.dart), but if
   /// there's no cache yet either (e.g. this device has never synced
   /// this user's progress), this still returns sensible seeded
   /// defaults instead of throwing and leaving a caller's loading
@@ -46,10 +58,16 @@ class ProgressService {
   Future<Map<String, LessonProgress>> getLessonStates(
     List<ModuleModel> modules,
   ) async {
+    _ensureMemoryUser();
     final collection = _collection;
     if (collection == null) return {};
 
+    final uid = _memoryUid;
     final lessons = _flattenLessons(modules);
+    if (_memoryLoaded &&
+        lessons.every((lesson) => _memoryStates.containsKey(lesson.id))) {
+      return {for (final lesson in lessons) lesson.id: _memoryStates[lesson.id]!};
+    }
     Map<String, dynamic> existing = {};
     try {
       final snapshot = await collection.get();
@@ -69,20 +87,31 @@ class ProgressService {
       }
     }
 
+    _ensureMemoryUser();
+    if (_memoryUid != uid) return {};
+
     final result = <String, LessonProgress>{};
     for (var i = 0; i < lessons.length; i++) {
       final lesson = lessons[i];
       final raw = existing[lesson.id];
-      result[lesson.id] = raw != null
-          ? LessonProgress.fromMap(raw)
-          : LessonProgress.initial(unlocked: i == 0);
+      // Preserve updates made while this read was in flight.
+      result[lesson.id] = _memoryStates.putIfAbsent(
+        lesson.id,
+        () => raw != null
+            ? LessonProgress.fromMap(raw)
+            : LessonProgress.initial(unlocked: i == 0),
+      );
     }
+    _memoryLoaded = true;
     return result;
   }
 
   Future<void> _saveLesson(String lessonId, LessonProgress progress) async {
+    _ensureMemoryUser();
     final collection = _collection;
     if (collection == null) return;
+    // Synchronize sign views, quiz results, and unlocks before awaiting writes.
+    _memoryStates[lessonId] = progress;
     try {
       // With persistence enabled, this resolves as soon as the write
       // lands in the local cache — it does not wait for the server —
@@ -103,14 +132,21 @@ class ProgressService {
     String signId,
     List<ModuleModel> modules,
   ) async {
-    final states = await getLessonStates(modules);
-    final current = states[lessonId];
+    _ensureMemoryUser();
+    final uid = _memoryUid;
+    if (!_memoryLoaded) {
+      await getLessonStates(modules);
+    }
+    _ensureMemoryUser();
+    if (_memoryUid != uid) return;
+    final current = _memoryStates[lessonId];
     if (current == null) return;
 
     if (!current.signsViewed.contains(signId)) {
       final updated = current.copyWith(
         signsViewed: [...current.signsViewed, signId],
       );
+      _memoryStates[lessonId] = updated;
       await _saveLesson(lessonId, updated);
     }
   }
@@ -124,9 +160,13 @@ class ProgressService {
     required int total,
     required List<ModuleModel> modules,
   }) async {
+    _ensureMemoryUser();
+    final uid = _memoryUid;
     final lessons = _flattenLessons(modules);
-    final states = await getLessonStates(modules);
-    final current = states[lessonId];
+    await getLessonStates(modules);
+    _ensureMemoryUser();
+    if (_memoryUid != uid) return false;
+    final current = _memoryStates[lessonId];
     if (current == null) return false;
 
     final passed = total > 0 && (score / total) >= 0.6;
@@ -140,13 +180,14 @@ class ProgressService {
       ),
     );
 
-    if (!passed) return false;
+    _ensureMemoryUser();
+    if (_memoryUid != uid || !passed) return false;
 
     final idx = lessons.indexWhere((l) => l.id == lessonId);
     if (idx == -1 || idx + 1 >= lessons.length) return false;
 
     final nextLesson = lessons[idx + 1];
-    final nextState = states[nextLesson.id];
+    final nextState = _memoryStates[nextLesson.id];
     if (nextState != null && !nextState.unlocked) {
       await _saveLesson(nextLesson.id, nextState.copyWith(unlocked: true));
       return true;
