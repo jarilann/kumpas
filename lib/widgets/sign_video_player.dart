@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+
 import '../constants/app_colors.dart';
 
 /// Shows the demo video for one sign, given its local Flutter asset
@@ -146,7 +147,11 @@ class _SignVideoPlayerState extends State<SignVideoPlayer> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.play_circle_outline, color: AppColors.textWhite, size: 48),
+            Icon(
+              Icons.play_circle_outline,
+              color: AppColors.textWhite,
+              size: 48,
+            ),
             SizedBox(height: 6),
             Text(
               'Wala pang video',
@@ -192,31 +197,25 @@ class _SignVideoPlayerState extends State<SignVideoPlayer> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _ControlButton(
-              icon: Icons.replay,
-              tooltip: 'Stop',
-              onTap: _stop,
-            ),
+            _ControlButton(icon: Icons.replay, tooltip: 'Stop', onTap: _stop),
             const SizedBox(width: 10),
             _ControlButton(
-              icon: controller.value.isPlaying
-                  ? Icons.pause
-                  : Icons.play_arrow,
+              icon: controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
               tooltip: controller.value.isPlaying ? 'Pause' : 'Play',
               onTap: _togglePlay,
               highlighted: true,
             ),
             const SizedBox(width: 10),
             _SpeedButton(
-              label: '0.5x',
-              active: _speed == 0.5,
-              onTap: () => _setSpeed(0.5),
+              label: '0.25x',
+              active: _speed == 0.25,
+              onTap: () => _setSpeed(0.25),
             ),
             const SizedBox(width: 10),
             _SpeedButton(
-              label: '1.5x',
-              active: _speed == 1.5,
-              onTap: () => _setSpeed(1.5),
+              label: '0.5x',
+              active: _speed == 0.5,
+              onTap: () => _setSpeed(0.5),
             ),
           ],
         ),
