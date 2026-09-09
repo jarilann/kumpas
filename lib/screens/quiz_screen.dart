@@ -1,5 +1,7 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
+
 import '../constants/app_colors.dart';
 import '../models/module_model.dart';
 import '../models/lesson_model.dart';
@@ -39,7 +41,8 @@ class _QuizScreenState extends State<QuizScreen> {
     final rng = Random();
     final questions = List<QuizQuestionModel>.from(source)..shuffle(rng);
     return questions.map((q) {
-      final order = List<int>.generate(q.options.length, (i) => i)..shuffle(rng);
+      final order = List<int>.generate(q.options.length, (i) => i)
+        ..shuffle(rng);
       final shuffledOptions = [for (final i in order) q.options[i]];
       final newCorrectIndex = order.indexOf(q.correctIndex);
       return QuizQuestionModel(
@@ -126,17 +129,23 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
           Text(
             widget.lesson.title,
-            style: const TextStyle(color: AppColors.textWhiteMuted, fontSize: 14),
+            style: const TextStyle(
+              color: AppColors.textWhiteMuted,
+              fontSize: 14,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             'Tanong ${_currentQuestion + 1} / ${_questions.length}',
-            style: const TextStyle(color: AppColors.textWhiteMuted, fontSize: 12),
+            style: const TextStyle(
+              color: AppColors.textWhiteMuted,
+              fontSize: 12,
+            ),
           ),
           const SizedBox(height: 16),
           if (referencedSign != null)
             Container(
-              height: 200,
+              height: 280,
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -162,9 +171,14 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
           const SizedBox(height: 24),
           Expanded(
-            child: ListView.separated(
+            child: GridView.builder(
               itemCount: question.options.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 12),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.8,
+              ),
               itemBuilder: (context, index) {
                 final isSelected = _selectedOption == index;
                 final isCorrectOption = index == question.correctIndex;
