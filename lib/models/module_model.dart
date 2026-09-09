@@ -1871,7 +1871,7 @@ final List<ModuleModel> kModules = [
             label: 'Building',
             meaning: 'Gusali',
             description: 'Dummy na paglalarawan ng senyas para sa \'Building\' (Gusali). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-            videoAssetPath: 'assets/videos/modyul_4/paaralan/building .mp4',
+            videoAssetPath: 'assets/videos/modyul_4/paaralan/building.mp4',
           ),
           SignModel(
             id: 'room',
