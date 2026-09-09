@@ -145,7 +145,7 @@ class _QuizScreenState extends State<QuizScreen> {
           const SizedBox(height: 16),
           if (referencedSign != null)
             Container(
-              height: 280,
+              height: 300,
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
