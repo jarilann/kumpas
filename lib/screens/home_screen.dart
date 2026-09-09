@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';
 import '../models/module_model.dart';
 import '../models/user_progress_model.dart';
 import '../services/progress_service.dart';
+import '../services/auth_service.dart';
 import 'module_list_screen.dart';
 import 'quiz_home_screen.dart';
 import 'progress_screen.dart';
@@ -28,14 +28,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String get _displayName {
-    final name = FirebaseAuth.instance.currentUser?.displayName;
+    final name = AuthService.instance.currentUser?.displayName;
     if (name == null || name.trim().isEmpty) {
       return 'Kaibigan'; // fallback greeting if no nickname is set
     }
     return name;
   }
 
-  bool get _isGuest => FirebaseAuth.instance.currentUser?.isAnonymous ?? false;
+  bool get _isGuest => AuthService.instance.currentUser?.isAnonymous ?? false;
 
   void _showInfoDialog() {
     showDialog(
@@ -67,10 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 12,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -112,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         // AuthWrapper's stream picks this up and swaps
                         // back to OnboardingScreen automatically.
-                        FirebaseAuth.instance.signOut();
+                        AuthService.instance.signOut();
                       },
                     ),
                   ],
@@ -121,7 +118,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ==================================================
                 // GUEST BANNER (shown only for anonymous users)
                 // ==================================================
-
                 if (_isGuest)
                   Container(
                     width: double.infinity,
@@ -149,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ==================================================
                 // GREETING
                 // ==================================================
-
                 Row(
                   children: [
                     Expanded(
@@ -162,10 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    const Text(
-                      '👋',
-                      style: TextStyle(fontSize: 24),
-                    ),
+                    const Text('👋', style: TextStyle(fontSize: 24)),
                   ],
                 ),
 
@@ -186,7 +178,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 // from ProgressService: the first module that's
                 // unlocked but not yet fully completed.
                 // ==================================================
-
                 FutureBuilder<Map<String, LessonProgress>>(
                   future: _statesFuture,
                   builder: (context, snapshot) {
@@ -206,8 +197,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                       if (pendingModule != null) {
                         goalTitle = 'Kumpletuhin ang ${pendingModule.number}';
-                        goalPercent =
-                            service.moduleProgressFraction(pendingModule, states);
+                        goalPercent = service.moduleProgressFraction(
+                          pendingModule,
+                          states,
+                        );
                       } else {
                         // Every unlocked module is completed.
                         goalTitle = 'Nakumpleto mo na ang lahat ng modyul!';
@@ -277,7 +270,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ==================================================
                 // TALAHANAYAN (quick action grid)
                 // ==================================================
-
                 const Text(
                   'Talahanayan',
                   style: TextStyle(
@@ -305,8 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const ModuleListScreen(),
+                              builder: (context) => const ModuleListScreen(),
                             ),
                           );
                         },
@@ -318,8 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const QuizHomeScreen(),
+                              builder: (context) => const QuizHomeScreen(),
                             ),
                           );
                         },
@@ -331,8 +321,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const ProgressScreen(),
+                              builder: (context) => const ProgressScreen(),
                             ),
                           );
                         },
@@ -344,8 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const BadgesScreen(),
+                              builder: (context) => const BadgesScreen(),
                             ),
                           );
                         },
@@ -390,11 +378,7 @@ class _DashboardActionCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 28,
-              color: AppColors.textWhite,
-            ),
+            Icon(icon, size: 28, color: AppColors.textWhite),
 
             const SizedBox(height: 8),
 
