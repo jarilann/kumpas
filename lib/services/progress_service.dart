@@ -166,7 +166,7 @@ class ProgressService {
     final current = _memoryStates[lessonId];
     if (current == null) return false;
 
-    final passed = total > 0 && (score / total) >= 0.6;
+    final passed = total > 0 && (score / total) >= 0.2;
 
     await _saveLesson(
       lessonId,
