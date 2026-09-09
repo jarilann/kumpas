@@ -1,12 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/lesson_model.dart';
 import '../models/module_model.dart';
 import '../models/user_progress_model.dart';
+import 'auth_service.dart';
 
-/// Reads/writes lesson progress in Firestore under:
-///   users/{uid}/lessonProgress/{lessonId}
+/// Reads/writes lesson progress locally in SharedPreferences under
+/// key 'kk_progress_{uid}', as a JSON map of lessonId -> LessonProgress.
 ///
 /// Locking is per-lesson (see [LessonProgress] docs): completing a
 /// lesson's quiz unlocks the next lesson in the flattened
@@ -14,8 +16,6 @@ import '../models/user_progress_model.dart';
 class ProgressService {
   ProgressService._();
   static final ProgressService instance = ProgressService._();
-
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   final Map<String, LessonProgress> _memoryStates = {};
   String? _memoryUid;
@@ -29,12 +29,12 @@ class ProgressService {
     _memoryLoaded = false;
   }
 
-  String? get _uid => FirebaseAuth.instance.currentUser?.uid;
+  String? get _uid => AuthService.instance.currentUser?.uid;
 
-  CollectionReference<Map<String, dynamic>>? get _collection {
+  String? get _prefsKey {
     final uid = _uid;
     if (uid == null) return null;
-    return _db.collection('users').doc(uid).collection('lessonProgress');
+    return 'kk_progress_$uid';
   }
 
   /// Flattens every module's lessons into a single ordered list —
@@ -48,43 +48,37 @@ class ProgressService {
   /// called for a user. Returns an empty map if the user isn't
   /// signed in.
   ///
-  /// Resilient to being offline: Firestore's default .get() already
-  /// falls back to the local cache when the server is unreachable
-  /// (see the persistenceEnabled setting in main.dart), but if
-  /// there's no cache yet either (e.g. this device has never synced
-  /// this user's progress), this still returns sensible seeded
-  /// defaults instead of throwing and leaving a caller's loading
-  /// spinner stuck forever.
+  /// Resilient to a corrupt or missing local cache: if nothing usable
+  /// is found in SharedPreferences (e.g. this is the very first run),
+  /// this still returns sensible seeded defaults instead of throwing
+  /// and leaving a caller's loading spinner stuck forever.
   Future<Map<String, LessonProgress>> getLessonStates(
     List<ModuleModel> modules,
   ) async {
     _ensureMemoryUser();
-    final collection = _collection;
-    if (collection == null) return {};
+    final key = _prefsKey;
+    if (key == null) return {};
 
     final uid = _memoryUid;
     final lessons = _flattenLessons(modules);
     if (_memoryLoaded &&
         lessons.every((lesson) => _memoryStates.containsKey(lesson.id))) {
-      return {for (final lesson in lessons) lesson.id: _memoryStates[lesson.id]!};
+      return {
+        for (final lesson in lessons) lesson.id: _memoryStates[lesson.id]!,
+      };
     }
+
     Map<String, dynamic> existing = {};
     try {
-      final snapshot = await collection.get();
-      existing = {for (final doc in snapshot.docs) doc.id: doc.data()};
-    } catch (_) {
-      try {
-        // Explicitly ask for cache-only, in case the plain .get()
-        // above failed for a reason other than "offline with no
-        // cache" (e.g. it hung waiting on the server rather than
-        // falling back automatically).
-        final cached = await collection.get(const GetOptions(source: Source.cache));
-        existing = {for (final doc in cached.docs) doc.id: doc.data()};
-      } catch (_) {
-        // Genuinely nothing available (offline + never synced on
-        // this device) — fall through with an empty map, which
-        // seeds every lesson to its default below.
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(key);
+      if (raw != null) {
+        existing = Map<String, dynamic>.from(jsonDecode(raw) as Map);
       }
+    } catch (_) {
+      // Genuinely nothing available or corrupt local data — fall
+      // through with an empty map, which seeds every lesson to its
+      // default below.
     }
 
     _ensureMemoryUser();
@@ -98,7 +92,7 @@ class ProgressService {
       result[lesson.id] = _memoryStates.putIfAbsent(
         lesson.id,
         () => raw != null
-            ? LessonProgress.fromMap(raw)
+            ? LessonProgress.fromMap(Map<String, dynamic>.from(raw as Map))
             : LessonProgress.initial(unlocked: i == 0),
       );
     }
@@ -106,18 +100,27 @@ class ProgressService {
     return result;
   }
 
+  /// Rewrites the whole per-user progress map to disk. Progress data
+  /// is small (a handful of lessons), so a full rewrite per save is
+  /// fine for this prototype's scale.
+  Future<void> _persistAll() async {
+    final key = _prefsKey;
+    if (key == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final map = {
+      for (final entry in _memoryStates.entries) entry.key: entry.value.toMap(),
+    };
+    await prefs.setString(key, jsonEncode(map));
+  }
+
   Future<void> _saveLesson(String lessonId, LessonProgress progress) async {
     _ensureMemoryUser();
-    final collection = _collection;
-    if (collection == null) return;
+    final key = _prefsKey;
+    if (key == null) return;
     // Synchronize sign views, quiz results, and unlocks before awaiting writes.
     _memoryStates[lessonId] = progress;
     try {
-      // With persistence enabled, this resolves as soon as the write
-      // lands in the local cache — it does not wait for the server —
-      // so this completes quickly even offline, and syncs to
-      // Firestore automatically once connectivity returns.
-      await collection.doc(lessonId).set(progress.toMap());
+      await _persistAll();
     } catch (_) {
       // Best-effort: callers of markSignViewed/submitQuizResult treat
       // saving as fire-and-forget, so a save failure here shouldn't
