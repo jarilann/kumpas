@@ -294,48 +294,72 @@ class _HomeScreenState extends State<HomeScreen> {
                       _DashboardActionCard(
                         icon: Icons.menu_book,
                         label: 'Matuto',
-                        onTap: () {
-                          Navigator.of(context).push(
+                        onTap: () async {
+                          await Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const ModuleListScreen(),
                             ),
                           );
+                          if (mounted) {
+                            setState(() {
+                              _statesFuture = ProgressService.instance
+                                  .getLessonStates(kModules);
+                            });
+                          }
                         },
                       ),
 
                       _DashboardActionCard(
                         icon: Icons.lightbulb,
                         label: 'Pagsusulit',
-                        onTap: () {
-                          Navigator.of(context).push(
+                        onTap: () async {
+                          await Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const QuizHomeScreen(),
                             ),
                           );
+                          if (mounted) {
+                            setState(() {
+                              _statesFuture = ProgressService.instance
+                                  .getLessonStates(kModules);
+                            });
+                          }
                         },
                       ),
 
                       _DashboardActionCard(
                         icon: Icons.show_chart,
                         label: 'Progreso',
-                        onTap: () {
-                          Navigator.of(context).push(
+                        onTap: () async {
+                          await Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const ProgressScreen(),
                             ),
                           );
+                          if (mounted) {
+                            setState(() {
+                              _statesFuture = ProgressService.instance
+                                  .getLessonStates(kModules);
+                            });
+                          }
                         },
                       ),
 
                       _DashboardActionCard(
                         icon: Icons.emoji_events,
                         label: 'Mga Badge',
-                        onTap: () {
-                          Navigator.of(context).push(
+                        onTap: () async {
+                          await Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const BadgesScreen(),
                             ),
                           );
+                          if (mounted) {
+                            setState(() {
+                              _statesFuture = ProgressService.instance
+                                  .getLessonStates(kModules);
+                            });
+                          }
                         },
                       ),
                     ],
