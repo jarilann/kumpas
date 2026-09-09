@@ -146,7 +146,7 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
             ),
           ),
           Text(
-            'Senyas: ${sign.label}',
+            'Senyas: ${sign.label}/${sign.meaning}',
             style: const TextStyle(
               color: AppColors.textWhite,
               fontSize: 26,
@@ -163,9 +163,7 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                     value: progress,
                     minHeight: 10,
                     backgroundColor: Colors.white24,
-                    valueColor: const AlwaysStoppedAnimation(
-                      Color(0xFF6FFF4B),
-                    ),
+                    valueColor: const AlwaysStoppedAnimation(Color(0xFF6FFF4B)),
                   ),
                 ),
               ),
@@ -237,8 +235,7 @@ class _LessonContentScreenState extends State<LessonContentScreen> {
                             child: _VariantButton(
                               label: 'Var 3',
                               selected: _selectedVariant == 3,
-                              onTap: () =>
-                                  setState(() => _selectedVariant = 3),
+                              onTap: () => setState(() => _selectedVariant = 3),
                             ),
                           ),
                         ],
