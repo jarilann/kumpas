@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';
@@ -10,7 +9,7 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = AuthService.instance.currentUser;
     final isGuest = user?.isAnonymous ?? false;
     final email = user?.email;
 
@@ -35,7 +34,11 @@ class SettingsScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.account_circle, color: AppColors.textWhite, size: 32),
+                const Icon(
+                  Icons.account_circle,
+                  color: AppColors.textWhite,
+                  size: 32,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -51,7 +54,10 @@ class SettingsScreen extends StatelessWidget {
                       if (isGuest)
                         const Text(
                           'Hindi na-save ang progreso ng bisita account',
-                          style: TextStyle(color: AppColors.textWhite, fontSize: 11),
+                          style: TextStyle(
+                            color: AppColors.textWhite,
+                            fontSize: 11,
+                          ),
                         ),
                     ],
                   ),
@@ -70,7 +76,8 @@ class SettingsScreen extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      error ?? 'Ipinadala ang link sa pag-reset ng password sa $email.',
+                      error ??
+                          'Ipinadala ang link sa pag-reset ng password sa $email.',
                     ),
                   ),
                 );
@@ -79,7 +86,7 @@ class SettingsScreen extends StatelessWidget {
           _SettingsTile(
             icon: Icons.logout_rounded,
             label: 'Mag-logout',
-            onTap: () => FirebaseAuth.instance.signOut(),
+            onTap: () => AuthService.instance.signOut(),
             // AuthWrapper's stream picks this up and swaps back to
             // OnboardingScreen automatically — same as the home
             // screen's logout icon.
@@ -102,7 +109,11 @@ class _SettingsTile extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const _SettingsTile({required this.icon, required this.label, required this.onTap});
+  const _SettingsTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +131,10 @@ class _SettingsTile extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 label,
-                style: const TextStyle(color: AppColors.textWhite, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  color: AppColors.textWhite,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const Spacer(),
               const Icon(Icons.chevron_right, color: AppColors.textWhiteMuted),

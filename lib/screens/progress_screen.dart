@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';
@@ -8,6 +7,7 @@ import '../models/module_model.dart';
 import '../models/user_progress_model.dart';
 import '../services/progress_service.dart';
 import '../widgets/module_widgets.dart';
+import '../services/auth_service.dart';
 
 /// Real progress tracker (mockup screen 14, "Progreso"), built off
 /// Firestore lesson-progress data via [ProgressService]. "Level" and
@@ -31,14 +31,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   String get _displayName {
-    final name = FirebaseAuth.instance.currentUser?.displayName;
+    final name = AuthService.instance.currentUser?.displayName;
     if (name == null || name.trim().isEmpty) return 'Kaibigan';
     return name;
   }
 
-  List<LessonModel> get _allLessons => [
-        for (final m in kModules) ...m.lessons,
-      ];
+  List<LessonModel> get _allLessons => [for (final m in kModules) ...m.lessons];
 
   @override
   Widget build(BuildContext context) {
@@ -61,16 +59,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(
-                    child: CircularProgressIndicator(color: AppColors.textWhite),
+                    child: CircularProgressIndicator(
+                      color: AppColors.textWhite,
+                    ),
                   );
                 }
                 final states = snapshot.data!;
                 final lessons = _allLessons;
 
-                final completedLessons =
-                    lessons.where((l) => states[l.id]?.completed == true).length;
-                final attemptedQuizzes =
-                    lessons.where((l) => (states[l.id]?.total ?? 0) > 0).length;
+                final completedLessons = lessons
+                    .where((l) => states[l.id]?.completed == true)
+                    .length;
+                final attemptedQuizzes = lessons
+                    .where((l) => (states[l.id]?.total ?? 0) > 0)
+                    .length;
                 final badgesEarned = earnedBadges(states).length;
 
                 final xp = completedLessons * 100;
@@ -97,7 +99,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         const CircleAvatar(
                           radius: 26,
                           backgroundColor: Colors.white24,
-                          child: Icon(Icons.person, color: AppColors.textWhite, size: 28),
+                          child: Icon(
+                            Icons.person,
+                            color: AppColors.textWhite,
+                            size: 28,
+                          ),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -131,13 +137,18 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         value: xpIntoLevel / 500,
                         minHeight: 10,
                         backgroundColor: Colors.white24,
-                        valueColor: const AlwaysStoppedAnimation(AppColors.progressBar),
+                        valueColor: const AlwaysStoppedAnimation(
+                          AppColors.progressBar,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '$xpIntoLevel/500XP',
-                      style: const TextStyle(color: AppColors.textWhiteMuted, fontSize: 11),
+                      style: const TextStyle(
+                        color: AppColors.textWhiteMuted,
+                        fontSize: 11,
+                      ),
                     ),
                     const SizedBox(height: 20),
                     const Text(
@@ -162,7 +173,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       value: attemptedQuizzes == 0
                           ? '0/${lessons.length}'
                           : '$attemptedQuizzes/${lessons.length} '
-                              '(${(attemptedQuizzes / lessons.length * 100).round()}%)',
+                                '(${(attemptedQuizzes / lessons.length * 100).round()}%)',
                     ),
                     _ProgressRow(
                       icon: Icons.emoji_events_rounded,
@@ -191,7 +202,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                             CircleAvatar(
                               radius: 18,
                               backgroundColor: Colors.white24,
-                              child: Icon(pendingModule.icon, color: AppColors.textWhite),
+                              child: Icon(
+                                pendingModule.icon,
+                                color: AppColors.textWhite,
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -217,14 +231,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                     children: [
                                       Expanded(
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                           child: LinearProgressIndicator(
-                                            value: pendingProgress.clamp(0.0, 1.0),
+                                            value: pendingProgress.clamp(
+                                              0.0,
+                                              1.0,
+                                            ),
                                             minHeight: 6,
                                             backgroundColor: Colors.white38,
-                                            valueColor: const AlwaysStoppedAnimation(
-                                              AppColors.progressBar,
-                                            ),
+                                            valueColor:
+                                                const AlwaysStoppedAnimation(
+                                                  AppColors.progressBar,
+                                                ),
                                           ),
                                         ),
                                       ),
@@ -262,7 +282,11 @@ class _ProgressRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _ProgressRow({required this.icon, required this.label, required this.value});
+  const _ProgressRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
