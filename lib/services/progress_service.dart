@@ -7,12 +7,6 @@ import '../models/module_model.dart';
 import '../models/user_progress_model.dart';
 import 'auth_service.dart';
 
-/// Reads/writes lesson progress locally in SharedPreferences under
-/// key 'kk_progress_{uid}', as a JSON map of lessonId -> LessonProgress.
-///
-/// Locking is per-lesson (see [LessonProgress] docs): completing a
-/// lesson's quiz unlocks the next lesson in the flattened
-/// module -> lesson sequence.
 class ProgressService {
   ProgressService._();
   static final ProgressService instance = ProgressService._();
