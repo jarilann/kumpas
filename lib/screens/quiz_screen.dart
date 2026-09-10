@@ -27,6 +27,11 @@ class _QuizScreenState extends State<QuizScreen> {
   int? _selectedOption;
   bool _answered = false;
 
+  /// 1, 2, or 3 — which of the referenced sign's accepted video
+  /// versions is currently shown (see [SignModel.hasVariant]).
+  /// Resets to 1 whenever a new question loads.
+  int _selectedVariant = 1;
+
   @override
   void initState() {
     super.initState();
@@ -99,6 +104,7 @@ class _QuizScreenState extends State<QuizScreen> {
         _currentQuestion++;
         _selectedOption = null;
         _answered = false;
+        _selectedVariant = 1;
       });
       return;
     }
@@ -166,12 +172,58 @@ class _QuizScreenState extends State<QuizScreen> {
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: SignVideoPlayer(
-                // Keyed on the question index (not just the sign) so a
-                // repeated sign across questions still gets a fresh,
-                // autoplaying-from-start controller each time.
-                key: ValueKey('quiz_${_currentQuestion}_${referencedSign.id}'),
-                assetPath: referencedSign.videoAssetPath,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SignVideoPlayer(
+                      // Keyed on the question index AND the selected
+                      // variant, so switching versions — or moving to
+                      // a repeated sign in a later question — always
+                      // gets a fresh, autoplaying-from-start controller.
+                      key: ValueKey(
+                        'quiz_${_currentQuestion}_${referencedSign.id}_$_selectedVariant',
+                      ),
+                      assetPath: switch (_selectedVariant) {
+                        3 => referencedSign.videoAssetPathVar3,
+                        2 => referencedSign.videoAssetPathVar2,
+                        _ => referencedSign.videoAssetPath,
+                      },
+                    ),
+                  ),
+                  if (referencedSign.hasVariant) ...[
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _VariantButton(
+                            label: 'Var 1',
+                            selected: _selectedVariant == 1,
+                            onTap: () => setState(() => _selectedVariant = 1),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _VariantButton(
+                            label: 'Var 2',
+                            selected: _selectedVariant == 2,
+                            onTap: () => setState(() => _selectedVariant = 2),
+                          ),
+                        ),
+                        if (referencedSign.hasThirdVariant) ...[
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _VariantButton(
+                              label: 'Var 3',
+                              selected: _selectedVariant == 3,
+                              onTap: () =>
+                                  setState(() => _selectedVariant = 3),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ],
               ),
             ),
           const SizedBox(height: 16),
@@ -250,6 +302,37 @@ class _QuizScreenState extends State<QuizScreen> {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// The "Var 1" / "Var 2" / "Var 3" toggle for signs with more than one
+/// accepted version — same widget/styling as the one on
+/// lesson_content_screen.dart's sign viewer, duplicated here (private
+/// to this file) rather than shared, since neither screen imports
+/// from the other.
+class _VariantButton extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _VariantButton({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        backgroundColor: selected ? AppColors.accentYellow : Colors.transparent,
+        foregroundColor: selected ? AppColors.primaryBlue : AppColors.textWhite,
+        side: const BorderSide(color: AppColors.textWhite),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+      ),
+      child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
     );
   }
 }
