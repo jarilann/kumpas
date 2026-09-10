@@ -5,6 +5,7 @@ import '../constants/app_colors.dart';
 import '../widgets/auth_widgets.dart';
 import '../services/auth_service.dart';
 import 'signup_screen.dart';
+import 'reset_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -180,6 +181,34 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
                 const SizedBox(height: 8),
+
+                // ==================================================
+                // FORGOT PASSWORD
+                // ==================================================
+
+                Align(
+                  alignment: Alignment.centerRight,
+
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ResetPasswordScreen(),
+                        ),
+                      );
+                    },
+
+                    child: const Text(
+                      'Nakalimutan ang Password?',
+
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textWhite,
+                      ),
+                    ),
+                  ),
+                ),
 
                 // ==================================================
                 // LOGIN ERROR

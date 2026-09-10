@@ -261,10 +261,9 @@ class AuthService extends ChangeNotifier {
   /// No email actually goes out locally — this just simulates success
   /// so the UI flow (login_screen.dart) behaves the same as before.
   /// True if [password] matches the currently signed-in account's
-  /// stored password. Used to gate the New Password / Confirm New
-  /// Password fields on the Change Password screen — they only
-  /// unlock once this returns true for whatever's typed into the Old
-  /// Password field. Guests (no real account) never match.
+  /// stored password. Used to gate New Password / Confirm New
+  /// Password on the Change Password screen (Settings) — they unlock
+  /// once this returns true for the Old Password field.
   Future<bool> verifyCurrentPassword(String password) async {
     final user = _currentUser;
     if (user == null || user.isAnonymous || user.email == null) return false;
@@ -277,10 +276,9 @@ class AuthService extends ChangeNotifier {
     return account['password'] == password;
   }
 
-  /// Updates the signed-in account's stored password. [oldPassword]
-  /// is re-checked here too (not just trusted from the UI's earlier
-  /// verifyCurrentPassword call) so this method is safe to call on
-  /// its own.
+  /// Updates the signed-in account's stored password. Re-checks
+  /// [oldPassword] itself (not just trusting an earlier
+  /// verifyCurrentPassword call), so this is safe to call on its own.
   Future<String?> changePassword({
     required String oldPassword,
     required String newPassword,
@@ -299,6 +297,62 @@ class AuthService extends ChangeNotifier {
 
     if (account == null || account['password'] != oldPassword) {
       return 'Maling lumang password.';
+    }
+
+    account['password'] = newPassword;
+    await _saveAccounts(prefs, accounts);
+    return null;
+  }
+
+  /// Offline stand-in for "forgot password" on the Login screen —
+  /// there's no email service to send a real reset link through, so
+  /// this checks [nickname] against the account's saved display name
+  /// instead, as a lightweight proof the person set the account up.
+  ///
+  /// NOTE: a display name isn't a secret, so this is demo-grade
+  /// identity verification, not real security — acceptable for an
+  /// offline prototype, but would need a genuine verification channel
+  /// (email, SMS, etc.) before this pattern belongs in production.
+  Future<bool> verifyIdentityForReset(String email, String nickname) async {
+    final prefs = await SharedPreferences.getInstance();
+    final accounts = await _loadAccounts(prefs);
+    final key = email.trim().toLowerCase();
+    final account = accounts[key] as Map<String, dynamic>?;
+    if (account == null) return false;
+
+    final storedName = (account['displayName'] as String?)?.trim().toLowerCase();
+    if (storedName == null || storedName.isEmpty) return false;
+
+    return storedName == nickname.trim().toLowerCase();
+  }
+
+  /// Resets [email]'s password to [newPassword], re-verifying
+  /// [nickname] itself rather than trusting an earlier
+  /// verifyIdentityForReset call. Does NOT sign the person in — they
+  /// still log in normally afterward with the new password.
+  Future<String?> resetPassword({
+    required String email,
+    required String nickname,
+    required String newPassword,
+  }) async {
+    if (newPassword.length < 6) {
+      return 'Masyadong mahina ang bagong password. Gumamit ng hindi bababa sa 6 na karakter.';
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final accounts = await _loadAccounts(prefs);
+    final key = email.trim().toLowerCase();
+    final account = accounts[key] as Map<String, dynamic>?;
+
+    if (account == null) {
+      return 'Walang account na nahanap para sa email na ito.';
+    }
+
+    final storedName = (account['displayName'] as String?)?.trim().toLowerCase();
+    if (storedName == null ||
+        storedName.isEmpty ||
+        storedName != nickname.trim().toLowerCase()) {
+      return 'Hindi tugma ang palayaw sa email na ito.';
     }
 
     account['password'] = newPassword;
