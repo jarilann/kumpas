@@ -215,8 +215,7 @@ class _QuizScreenState extends State<QuizScreen> {
                             child: _VariantButton(
                               label: 'Var 3',
                               selected: _selectedVariant == 3,
-                              onTap: () =>
-                                  setState(() => _selectedVariant = 3),
+                              onTap: () => setState(() => _selectedVariant = 3),
                             ),
                           ),
                         ],
@@ -267,14 +266,36 @@ class _QuizScreenState extends State<QuizScreen> {
                     borderRadius: BorderRadius.circular(14),
                     onTap: () => _selectOption(index),
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        _getOptionDisplay(question.options[index]),
-                        style: const TextStyle(
-                          color: AppColors.textWhite,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      padding: const EdgeInsets.all(12),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // FittedBox alone would let the Text lay
+                          // out on one unbounded line before scaling
+                          // it down — for a long combined "English /
+                          // Tagalog" answer that shrinks the font
+                          // tiny. Fixing the inner SizedBox's width to
+                          // the actual cell width first lets the text
+                          // wrap onto multiple lines normally, and
+                          // FittedBox then only needs to scale down
+                          // as much as the wrapped block's height
+                          // requires — so short answers stay full
+                          // size and only genuinely long ones shrink.
+                          return FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: SizedBox(
+                              width: constraints.maxWidth,
+                              child: Text(
+                                _getOptionDisplay(question.options[index]),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: AppColors.textWhite,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
