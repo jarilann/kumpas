@@ -13,6 +13,7 @@ class AuthTextField extends StatelessWidget {
   final IconData icon;
   final bool obscureText;
   final Widget? suffixIcon;
+  final ValueChanged<String>? onChanged;
 
   const AuthTextField({
     super.key,
@@ -21,6 +22,7 @@ class AuthTextField extends StatelessWidget {
     required this.icon,
     this.obscureText = false,
     this.suffixIcon,
+    this.onChanged,
   });
 
   @override
@@ -44,6 +46,7 @@ class AuthTextField extends StatelessWidget {
         TextField(
           controller: controller,
           obscureText: obscureText,
+          onChanged: onChanged,
 
           style: const TextStyle(
             color: Colors.black87,
@@ -104,7 +107,7 @@ class AuthTextField extends StatelessWidget {
 
 class AuthButton extends StatelessWidget {
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
 
   const AuthButton({
@@ -119,7 +122,7 @@ class AuthButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
+        onPressed: (isLoading || onPressed == null) ? null : onPressed,
 
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryBlue,

@@ -260,13 +260,49 @@ class AuthService extends ChangeNotifier {
 
   /// No email actually goes out locally — this just simulates success
   /// so the UI flow (login_screen.dart) behaves the same as before.
-  Future<String?> sendPasswordReset(String email) async {
+  /// True if [password] matches the currently signed-in account's
+  /// stored password. Used to gate the New Password / Confirm New
+  /// Password fields on the Change Password screen — they only
+  /// unlock once this returns true for whatever's typed into the Old
+  /// Password field. Guests (no real account) never match.
+  Future<bool> verifyCurrentPassword(String password) async {
+    final user = _currentUser;
+    if (user == null || user.isAnonymous || user.email == null) return false;
+
     final prefs = await SharedPreferences.getInstance();
     final accounts = await _loadAccounts(prefs);
-    final key = email.trim().toLowerCase();
-    if (!accounts.containsKey(key)) {
-      return 'Walang account na nahanap para sa email na ito.';
+    final account = accounts[user.email] as Map<String, dynamic>?;
+    if (account == null) return false;
+
+    return account['password'] == password;
+  }
+
+  /// Updates the signed-in account's stored password. [oldPassword]
+  /// is re-checked here too (not just trusted from the UI's earlier
+  /// verifyCurrentPassword call) so this method is safe to call on
+  /// its own.
+  Future<String?> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    final user = _currentUser;
+    if (user == null || user.isAnonymous || user.email == null) {
+      return 'Kailangan naka-login gamit ang totoong account para magpalit ng password.';
     }
+    if (newPassword.length < 6) {
+      return 'Masyadong mahina ang bagong password. Gumamit ng hindi bababa sa 6 na karakter.';
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final accounts = await _loadAccounts(prefs);
+    final account = accounts[user.email] as Map<String, dynamic>?;
+
+    if (account == null || account['password'] != oldPassword) {
+      return 'Maling lumang password.';
+    }
+
+    account['password'] = newPassword;
+    await _saveAccounts(prefs, accounts);
     return null;
   }
 

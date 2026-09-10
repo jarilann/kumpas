@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../services/auth_service.dart';
 import '../widgets/module_widgets.dart';
+import 'change_password_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -70,15 +71,10 @@ class SettingsScreen extends StatelessWidget {
             _SettingsTile(
               icon: Icons.lock_reset_rounded,
               label: 'Baguhin ang Password',
-              onTap: () async {
-                final error = await AuthService().sendPasswordReset(email);
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      error ??
-                          'Ipinadala ang link sa pag-reset ng password sa $email.',
-                    ),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const ChangePasswordScreen(),
                   ),
                 );
               },
