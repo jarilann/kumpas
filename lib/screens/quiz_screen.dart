@@ -64,6 +64,20 @@ class _QuizScreenState extends State<QuizScreen> {
     return null;
   }
 
+  /// Display-only transform: shows "Orange / Kahel" instead of just
+  /// "Orange" for any option that matches a sign in this lesson. The
+  /// underlying [option] string itself is untouched — quiz checking
+  /// in [_selectOption] compares indices, not text, so this never
+  /// affects correctness.
+  String _getOptionDisplay(String option) {
+    for (final sign in widget.lesson.signs) {
+      if (sign.label == option) {
+        return '${sign.label} / ${sign.meaning}';
+      }
+    }
+    return option;
+  }
+
   void _selectOption(int optionIndex) {
     if (_answered) return;
 
@@ -203,7 +217,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Text(
-                        question.options[index],
+                        _getOptionDisplay(question.options[index]),
                         style: const TextStyle(
                           color: AppColors.textWhite,
                           fontSize: 16,
