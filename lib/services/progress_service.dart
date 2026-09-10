@@ -6,6 +6,7 @@ import '../models/lesson_model.dart';
 import '../models/module_model.dart';
 import '../models/user_progress_model.dart';
 import 'auth_service.dart';
+import 'progress_storage_keys.dart';
 
 class ProgressService {
   ProgressService._();
@@ -28,7 +29,7 @@ class ProgressService {
   String? get _prefsKey {
     final uid = _uid;
     if (uid == null) return null;
-    return 'kk_progress_$uid';
+    return progressPrefsKey(uid);
   }
 
   /// Flattens every module's lessons into a single ordered list —

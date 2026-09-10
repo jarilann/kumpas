@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/local_user_model.dart';
+import 'progress_storage_keys.dart';
 
 /// Local, offline stand-in for Firebase Auth. Accounts (email ->
 /// {password, displayName}) live in SharedPreferences under
@@ -85,6 +86,89 @@ class AuthService extends ChangeNotifier {
     return List.generate(16, (_) => rand.nextInt(16).toRadixString(16)).join();
   }
 
+  /// If someone was browsing as bisita/guest and now signs up or logs
+  /// into a real account, their guest progress otherwise gets stranded
+  /// under the old random guest uid — it's still on disk, but nothing
+  /// ever reads that key again. This copies it over to [toUid].
+  ///
+  /// For signUp, [toUid]'s progress is empty, so the guest's progress
+  /// just becomes the account's progress outright. For signIn (an
+  /// existing account may already have its own progress from a
+  /// previous session), this merges lesson-by-lesson instead of
+  /// overwriting, keeping whichever side is further along for each
+  /// lesson so neither session's progress gets clobbered.
+  Future<void> _migrateGuestProgress(
+    SharedPreferences prefs,
+    String fromUid,
+    String toUid,
+  ) async {
+    if (fromUid == toUid) return;
+    final fromKey = progressPrefsKey(fromUid);
+    final toKey = progressPrefsKey(toUid);
+
+    final fromRaw = prefs.getString(fromKey);
+    if (fromRaw == null) return; // guest never actually made progress
+
+    Map<String, dynamic> guestProgress;
+    try {
+      guestProgress = Map<String, dynamic>.from(jsonDecode(fromRaw) as Map);
+    } catch (_) {
+      return;
+    }
+    if (guestProgress.isEmpty) return;
+
+    Map<String, dynamic> accountProgress = {};
+    final toRaw = prefs.getString(toKey);
+    if (toRaw != null) {
+      try {
+        accountProgress = Map<String, dynamic>.from(jsonDecode(toRaw) as Map);
+      } catch (_) {
+        // Corrupt existing data — treat as empty rather than abort;
+        // the guest's progress below still lands safely either way.
+      }
+    }
+
+    final merged = Map<String, dynamic>.from(accountProgress);
+    for (final entry in guestProgress.entries) {
+      final guestLesson = Map<String, dynamic>.from(entry.value as Map);
+      final existing = merged[entry.key] as Map<String, dynamic>?;
+
+      if (existing == null) {
+        merged[entry.key] = guestLesson;
+        continue;
+      }
+
+      final existingScore = (existing['score'] as num?)?.toInt() ?? 0;
+      final existingTotal = (existing['total'] as num?)?.toInt() ?? 0;
+      final guestScore = (guestLesson['score'] as num?)?.toInt() ?? 0;
+      final guestTotal = (guestLesson['total'] as num?)?.toInt() ?? 0;
+      final existingRatio =
+          existingTotal > 0 ? existingScore / existingTotal : -1.0;
+      final guestRatio = guestTotal > 0 ? guestScore / guestTotal : -1.0;
+      final useGuestScore = guestRatio > existingRatio;
+
+      final mergedSignsViewed = <String>{
+        ...List<String>.from(existing['signsViewed'] as List? ?? const []),
+        ...List<String>.from(guestLesson['signsViewed'] as List? ?? const []),
+      }.toList();
+
+      merged[entry.key] = {
+        'unlocked':
+            existing['unlocked'] == true || guestLesson['unlocked'] == true,
+        'completed':
+            existing['completed'] == true || guestLesson['completed'] == true,
+        'score': useGuestScore ? guestScore : existingScore,
+        'total': useGuestScore ? guestTotal : existingTotal,
+        'signsViewed': mergedSignsViewed,
+      };
+    }
+
+    await prefs.setString(toKey, jsonEncode(merged));
+    // The guest identity is discarded right after this, so its
+    // now-merged progress would otherwise sit around as dead data.
+    await prefs.remove(fromKey);
+  }
+
   Future<String?> signIn(String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
     final accounts = await _loadAccounts(prefs);
@@ -98,12 +182,21 @@ class AuthService extends ChangeNotifier {
       return 'Maling password. Subukang muli.';
     }
 
+    // Capture the guest/bisita uid (if that's what we currently are)
+    // BEFORE switching _currentUser below, so any progress made while
+    // browsing as a guest can be merged into the account being signed
+    // into.
+    final guestUid = _currentUser?.isAnonymous == true ? _currentUser!.uid : null;
+
     _currentUser = LocalUser(
       uid: account['uid'] as String,
       email: key,
       displayName: account['displayName'] as String?,
       isAnonymous: false,
     );
+    if (guestUid != null) {
+      await _migrateGuestProgress(prefs, guestUid, _currentUser!.uid);
+    }
     await _persistSession(prefs);
     notifyListeners();
     return null;
@@ -121,11 +214,16 @@ class AuthService extends ChangeNotifier {
       return 'May account na gamit ang email na ito.';
     }
 
+    final guestUid = _currentUser?.isAnonymous == true ? _currentUser!.uid : null;
+
     final uid = _newUid();
     accounts[key] = {'uid': uid, 'password': password, 'displayName': null};
     await _saveAccounts(prefs, accounts);
 
     _currentUser = LocalUser(uid: uid, email: key, isAnonymous: false);
+    if (guestUid != null) {
+      await _migrateGuestProgress(prefs, guestUid, uid);
+    }
     await _persistSession(prefs);
     notifyListeners();
     return null;
