@@ -138,7 +138,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         minHeight: 10,
                         backgroundColor: Colors.white24,
                         valueColor: const AlwaysStoppedAnimation(
-                          AppColors.progressBar,
+                          AppColors.xpBarColor,
                         ),
                       ),
                     ),
