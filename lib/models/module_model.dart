@@ -2498,12 +2498,6 @@ final List<ModuleModel> kModules = [
             videoAssetPath: 'assets/videos/compressed/modyul_5/mga_direksyon/straight.mp4',
           ),
           SignModel(
-            id: 'turn',
-            label: 'Turn',
-            meaning: 'Liko',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Turn\' (Liko). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-          ),
-          SignModel(
             id: 'stop',
             label: 'Stop',
             meaning: 'Hinto / Para',
@@ -2570,12 +2564,6 @@ final List<ModuleModel> kModules = [
           ),
           QuizQuestionModel(
             question: 'Anong direksyon ito?',
-            signLabel: 'Turn',
-            options: ['Stop', 'Near', 'Turn', 'Go'],
-            correctIndex: 2,
-          ),
-          QuizQuestionModel(
-            question: 'Anong direksyon ito?',
             signLabel: 'Stop',
             options: ['Stop', 'Near', 'Go', 'Forward'],
             correctIndex: 0,
@@ -2605,12 +2593,6 @@ final List<ModuleModel> kModules = [
             description: 'Dummy na paglalarawan ng senyas para sa \'Help, please.\' (Tulong, pakiusap.). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath:
                 'assets/videos/compressed/modyul_5/paghingi_ng_tulong/help_please.mp4',
-          ),
-          SignModel(
-            id: 'can_you_help_me',
-            label: 'Can you help me?',
-            meaning: 'Pwede mo ba akong tulungan?',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Can you help me?\' (Pwede mo ba akong tulungan?). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
           ),
           SignModel(
             id: 'please_wait',
@@ -2722,17 +2704,6 @@ final List<ModuleModel> kModules = [
               'Help, please.',
             ],
             correctIndex: 3,
-          ),
-          QuizQuestionModel(
-            question: 'Anong senyas ito?',
-            signLabel: 'Can you help me?',
-            options: [
-              'Please sign slowly.',
-              'Again, please.',
-              'Can you help me?',
-              'Please wait.',
-            ],
-            correctIndex: 2,
           ),
           QuizQuestionModel(
             question: 'Anong senyas ito?',
@@ -2884,36 +2855,12 @@ final List<ModuleModel> kModules = [
         title: 'Mga Lugar Araw-araw',
         signs: [
           SignModel(
-            id: 'school',
-            label: 'School',
-            meaning: 'Paaralan / Eskwelahan',
-            description: 'Dummy na paglalarawan ng senyas para sa \'School\' (Paaralan / Eskwelahan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-          ),
-          SignModel(
-            id: 'classroom',
-            label: 'Classroom',
-            meaning: 'Silid-aralan',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Classroom\' (Silid-aralan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-          ),
-          SignModel(
             id: 'office',
             label: 'Office',
             meaning: 'Tanggapan / Opisina',
             description: 'Dummy na paglalarawan ng senyas para sa \'Office\' (Tanggapan / Opisina). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath:
                 'assets/videos/compressed/modyul_5/mga_lugar_araw_araw/office.mp4',
-          ),
-          SignModel(
-            id: 'principal_s_office',
-            label: 'Principal\'s office',
-            meaning: 'Tanggapan ng Punong-guro',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Principal\'s office\' (Tanggapan ng Punong-guro). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-          ),
-          SignModel(
-            id: 'guidance_office',
-            label: 'Guidance office',
-            meaning: 'Tanggapan ng Patnubay',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Guidance office\' (Tanggapan ng Patnubay). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
           ),
           SignModel(
             id: 'clinic',
@@ -2954,12 +2901,6 @@ final List<ModuleModel> kModules = [
             description: 'Dummy na paglalarawan ng senyas para sa \'Gymnasium\' (Jimnasya / Gym). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath:
                 'assets/videos/compressed/modyul_5/mga_lugar_araw_araw/gymnasium.mp4',
-          ),
-          SignModel(
-            id: 'comfort_room_bathroom',
-            label: 'Comfort room / bathroom',
-            meaning: 'Palikuran / Banyo',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Comfort room / bathroom\' (Palikuran / Banyo). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
           ),
           SignModel(
             id: 'entrance',
@@ -3009,24 +2950,12 @@ final List<ModuleModel> kModules = [
                 'assets/videos/compressed/modyul_5/mga_lugar_araw_araw/church.mp4',
           ),
           SignModel(
-            id: 'market',
-            label: 'Market',
-            meaning: 'Pamilihan / Palengke',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Market\' (Pamilihan / Palengke). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-          ),
-          SignModel(
             id: 'grocery_store',
             label: 'Grocery store',
             meaning: 'Tindahan ng Groseri',
             description: 'Dummy na paglalarawan ng senyas para sa \'Grocery store\' (Tindahan ng Groseri). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath:
                 'assets/videos/compressed/modyul_5/mga_lugar_araw_araw/grocery_store.mp4',
-          ),
-          SignModel(
-            id: 'restaurant',
-            label: 'Restaurant',
-            meaning: 'Kainang-pambayan / Restawran',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Restaurant\' (Kainang-pambayan / Restawran). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
           ),
           SignModel(
             id: 'mall',
@@ -3054,24 +2983,6 @@ final List<ModuleModel> kModules = [
             videoAssetPathVar2: 'assets/videos/compressed/modyul_5/mga_lugar_araw_araw/post_office_var2.mp4',
           ),
           SignModel(
-            id: 'park',
-            label: 'Park',
-            meaning: 'Parke / Pasyalan',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Park\' (Parke / Pasyalan). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-          ),
-          SignModel(
-            id: 'terminal',
-            label: 'Terminal',
-            meaning: 'Terminal',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Terminal\' (Terminal). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-          ),
-          SignModel(
-            id: 'train_station',
-            label: 'Train station',
-            meaning: 'Estasyon ng tren',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Train station\' (Estasyon ng tren). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-          ),
-          SignModel(
             id: 'airport',
             label: 'Airport',
             meaning: 'Paliparan',
@@ -3083,47 +2994,13 @@ final List<ModuleModel> kModules = [
         quiz: [
           QuizQuestionModel(
             question: 'Anong lugar ito?',
-            signLabel: 'School',
-            options: ['Office', 'Classroom', 'Principal\'s office', 'School'],
-            correctIndex: 3,
-          ),
-          QuizQuestionModel(
-            question: 'Anong lugar ito?',
-            signLabel: 'Classroom',
-            options: [
-              'Guidance office',
-              'Principal\'s office',
-              'Classroom',
-              'Office',
-            ],
-            correctIndex: 2,
-          ),
-          QuizQuestionModel(
-            question: 'Anong lugar ito?',
             signLabel: 'Office',
             options: [
-              'Principal\'s office',
+              'Library',
               'Clinic',
-              'Guidance office',
+              'Canteen',
               'Office',
             ],
-            correctIndex: 3,
-          ),
-          QuizQuestionModel(
-            question: 'Anong lugar ito?',
-            signLabel: 'Principal\'s office',
-            options: [
-              'Guidance office',
-              'Clinic',
-              'Principal\'s office',
-              'Library',
-            ],
-            correctIndex: 2,
-          ),
-          QuizQuestionModel(
-            question: 'Anong lugar ito?',
-            signLabel: 'Guidance office',
-            options: ['Clinic', 'Library', 'Canteen', 'Guidance office'],
             correctIndex: 3,
           ),
           QuizQuestionModel(
@@ -3143,7 +3020,7 @@ final List<ModuleModel> kModules = [
             signLabel: 'Canteen',
             options: [
               'Laboratory',
-              'Comfort room / bathroom',
+              'Entrance',
               'Canteen',
               'Gymnasium',
             ],
@@ -3154,7 +3031,7 @@ final List<ModuleModel> kModules = [
             signLabel: 'Laboratory',
             options: [
               'Laboratory',
-              'Comfort room / bathroom',
+              'Exit',
               'Gymnasium',
               'Entrance',
             ],
@@ -3167,20 +3044,9 @@ final List<ModuleModel> kModules = [
               'Entrance',
               'Exit',
               'Gymnasium',
-              'Comfort room / bathroom',
+              'Police station',
             ],
             correctIndex: 2,
-          ),
-          QuizQuestionModel(
-            question: 'Anong lugar ito?',
-            signLabel: 'Comfort room / bathroom',
-            options: [
-              'Exit',
-              'Entrance',
-              'Police station',
-              'Comfort room / bathroom',
-            ],
-            correctIndex: 3,
           ),
           QuizQuestionModel(
             question: 'Anong lugar ito?',
@@ -3213,83 +3079,53 @@ final List<ModuleModel> kModules = [
           QuizQuestionModel(
             question: 'Anong lugar ito?',
             signLabel: 'Fire station',
-            options: ['Fire station', 'Government office', 'Market', 'Church'],
+            options: ['Fire station', 'Government office', 'Mall', 'Church'],
             correctIndex: 0,
           ),
           QuizQuestionModel(
             question: 'Anong lugar ito?',
             signLabel: 'Government office',
-            options: ['Grocery store', 'Government office', 'Market', 'Church'],
+            options: ['Grocery store', 'Government office', 'Bank', 'Church'],
             correctIndex: 1,
           ),
           QuizQuestionModel(
             question: 'Anong lugar ito?',
             signLabel: 'Church',
-            options: ['Market', 'Restaurant', 'Grocery store', 'Church'],
+            options: ['Post office', 'Bank', 'Grocery store', 'Church'],
             correctIndex: 3,
-          ),
-          QuizQuestionModel(
-            question: 'Anong lugar ito?',
-            signLabel: 'Market',
-            options: ['Grocery store', 'Mall', 'Market', 'Restaurant'],
-            correctIndex: 2,
           ),
           QuizQuestionModel(
             question: 'Anong lugar ito?',
             signLabel: 'Grocery store',
-            options: ['Bank', 'Mall', 'Restaurant', 'Grocery store'],
+            options: ['Bank', 'Mall', 'Airport', 'Grocery store'],
             correctIndex: 3,
           ),
           QuizQuestionModel(
             question: 'Anong lugar ito?',
-            signLabel: 'Restaurant',
-            options: ['Restaurant', 'Mall', 'Bank', 'Post office'],
-            correctIndex: 0,
-          ),
-          QuizQuestionModel(
-            question: 'Anong lugar ito?',
             signLabel: 'Mall',
-            options: ['Mall', 'Post office', 'Park', 'Bank'],
+            options: ['Mall', 'Post office', 'Clinic', 'Bank'],
             correctIndex: 0,
           ),
           QuizQuestionModel(
             question: 'Anong lugar ito?',
             signLabel: 'Bank',
-            options: ['Bank', 'Terminal', 'Park', 'Post office'],
+            options: ['Bank', 'Library', 'Canteen', 'Post office'],
             correctIndex: 0,
           ),
           QuizQuestionModel(
             question: 'Anong lugar ito?',
             signLabel: 'Post office',
-            options: ['Park', 'Train station', 'Terminal', 'Post office'],
+            options: ['Canteen', 'Laboratory', 'Gymnasium', 'Post office'],
             correctIndex: 3,
-          ),
-          QuizQuestionModel(
-            question: 'Anong lugar ito?',
-            signLabel: 'Park',
-            options: ['Train station', 'Airport', 'Park', 'Terminal'],
-            correctIndex: 2,
-          ),
-          QuizQuestionModel(
-            question: 'Anong lugar ito?',
-            signLabel: 'Terminal',
-            options: ['Airport', 'Terminal', 'Train station', 'School'],
-            correctIndex: 1,
-          ),
-          QuizQuestionModel(
-            question: 'Anong lugar ito?',
-            signLabel: 'Train station',
-            options: ['Airport', 'Classroom', 'Train station', 'School'],
-            correctIndex: 2,
           ),
           QuizQuestionModel(
             question: 'Anong lugar ito?',
             signLabel: 'Airport',
-            options: ['Office', 'Classroom', 'School', 'Airport'],
+            options: ['Office', 'Entrance', 'Exit', 'Airport'],
             correctIndex: 3,
           ),
         ],
-      ),
+      )
     ],
   ),
   ModuleModel(
@@ -3427,13 +3263,6 @@ final List<ModuleModel> kModules = [
             meaning: 'Uniporme',
             description: 'Dummy na paglalarawan ng senyas para sa \'Uniform\' (Uniporme). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath: 'assets/videos/compressed/modyul_6/damit/uniform.mp4',
-          ),
-          SignModel(
-            id: 'clothes',
-            label: 'Clothes',
-            meaning: 'Mga damit',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Clothes\' (Mga damit). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-            videoAssetPath: 'assets/videos/compressed/modyul_6/damit/mga damit.mp4',
           ),
           SignModel(
             id: 'put_on_your_shirt',
@@ -3582,17 +3411,6 @@ final List<ModuleModel> kModules = [
           ),
           QuizQuestionModel(
             question: 'Anong senyas ito?',
-            signLabel: 'Clothes',
-            options: [
-              'Change your clothes.',
-              'Take off your shirt.',
-              'Put on your shirt.',
-              'Clothes',
-            ],
-            correctIndex: 3,
-          ),
-          QuizQuestionModel(
-            question: 'Anong senyas ito?',
             signLabel: 'Put on your shirt.',
             options: [
               'Put on your shirt.',
@@ -3700,7 +3518,7 @@ final List<ModuleModel> kModules = [
             meaning: 'Dila',
             description: 'Dummy na paglalarawan ng senyas para sa \'Tongue\' (Dila). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath:
-                'assets/videos/compressed/modyul_6/bahagi_ng_katawan/tongue .mp4',
+                'assets/videos/compressed/modyul_6/bahagi_ng_katawan/tongue.mp4',
           ),
           SignModel(
             id: 'neck',
@@ -3792,14 +3610,6 @@ final List<ModuleModel> kModules = [
             description: 'Dummy na paglalarawan ng senyas para sa \'My ear hurts.\' (Masakit ang tainga ko.). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
             videoAssetPath:
                 'assets/videos/compressed/modyul_6/bahagi_ng_katawan/my_ear_hurts.mp4',
-          ),
-          SignModel(
-            id: 'brush_your_teeth',
-            label: 'Brush your teeth.',
-            meaning: 'Magsepilyo ka ng ngipin.',
-            description: 'Dummy na paglalarawan ng senyas para sa \'Brush your teeth.\' (Magsepilyo ka ng ngipin.). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-            videoAssetPath:
-                'assets/videos/compressed/modyul_6/bahagi_ng_katawan/brush_your_teeth.mp4',
           ),
           SignModel(
             id: 'wash_your_hands',
@@ -3955,12 +3765,6 @@ final List<ModuleModel> kModules = [
               'Head',
               'Brush your teeth.',
             ],
-            correctIndex: 0,
-          ),
-          QuizQuestionModel(
-            question: 'Anong bahagi ng katawan ito?',
-            signLabel: 'Brush your teeth.',
-            options: ['Brush your teeth.', 'Hair', 'Head', 'Wash your hands.'],
             correctIndex: 0,
           ),
           QuizQuestionModel(
@@ -4305,7 +4109,7 @@ final List<ModuleModel> kModules = [
             label: 'Spring Rolls',
             meaning: 'Lumpia',
             description: 'Dummy na paglalarawan ng senyas para sa \'Spring Rolls\' (Lumpia). Papalitan ito ng aktwal na paglalarawan mula sa FSL advocate.',
-            videoAssetPath: 'assets/videos/compressed/modyul_7/pagkain/spring rolls.mp4',
+            videoAssetPath: 'assets/videos/compressed/modyul_7/pagkain/spring_rolls.mp4',
           ),
           SignModel(
             id: 'grilled',

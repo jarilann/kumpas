@@ -76,8 +76,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 final badgesEarned = earnedBadges(states).length;
 
                 final xp = completedLessons * 100;
-                final level = (xp ~/ 500) + 1;
-                final xpIntoLevel = xp % 500;
+final completedModules = kModules
+    .where((m) => ProgressService.instance.isModuleCompleted(m, states))
+    .length;
+
+final level = completedModules;
+final allLessonsCompleted =
+    completedLessons == lessons.length && lessons.isNotEmpty;
+final xpIntoLevel = allLessonsCompleted ? 500 : xp % 500;
 
                 final service = ProgressService.instance;
                 ModuleModel? pendingModule;
